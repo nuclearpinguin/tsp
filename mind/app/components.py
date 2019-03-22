@@ -5,47 +5,38 @@ import dash_table
 import pandas as pd
 import datetime
 
-class MainGrpah:
-    component = html.Div(children=[
-        html.H1(children='Hello Dash'),
+from app.helpers import make_random_graph
 
-        html.Div(children='''
-                Dash: A web application framework for Python.
-            '''),
 
-        dcc.Graph(
+class MainGraph:
+    component = dcc.Graph(
             id='example-graph',
-            figure={
-                'data': [
-                    {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
-                    {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
-                ],
-                'layout': {
-                    'title': 'Dash Data Visualization'
-                }
-            }
+            figure=make_random_graph()
         )
-    ])
 
 
 class Upload:
-    component = dcc.Upload(
-        id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
-        ]),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-    )
+    def __init__(self, idx: str, name: str = 'Select Files'):
+        self.component = html.Div([
+            html.P(name),
+            dcc.Upload(
+                id=idx,
+                children=html.Div([
+                    'Drag and Drop or ',
+                    html.A('Select Files')
+                ]),
+                style={
+                    'width': '100%',
+                    'height': '60px',
+                    'lineHeight': '60px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                    'textAlign': 'center',
+                    'margin': '10px'
+                },
+            )
+        ])
 
 
 class UploadedTable:
@@ -68,3 +59,4 @@ class UploadedTable:
                 'wordBreak': 'break-all'
             })
         ])
+
