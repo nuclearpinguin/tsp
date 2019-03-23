@@ -1,5 +1,5 @@
 # tsp
-Uni project solving TSP
+Uni project solving tsp
 
 To run app just do:
 `python app.py`
