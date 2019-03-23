@@ -5,13 +5,13 @@ import dash_table
 import pandas as pd
 import datetime
 
-from app.helpers import make_random_graph
+from app.helpers import make_graph
 
 
 class MainGraph:
     component = dcc.Graph(
             id='example-graph',
-            figure=make_random_graph()
+            figure=make_graph()
         )
 
 
@@ -65,14 +65,19 @@ class UploadedTable:
 
 class Description:
     component = dcc.Markdown('''
-### Some nice description and technical info
+### About the Traveling Salesman Problem
 
-Dash supports [Markdown](http://commonmark.org/help).
+Given a list of cities and the distances between each pair of cities, 
+what is the shortest possible route that visits each city and returns to the origin city? 
+([Wiki](http://commonmark.org/help))
 
-Markdown is a simple way to write and format text.
-It includes a syntax for things like **bold text** and *italics*,
-[links](http://commonmark.org/help), inline `code` snippets, lists,
-quotes, and more.
+This app allows you to solve the problem. But first you have to upload three files:
+
+- Matrix of connections between cities
+
+- Cities coordinates
+
+- Additional information about each city
         ''')
 
 

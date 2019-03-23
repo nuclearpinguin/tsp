@@ -4,6 +4,7 @@ import plotly.graph_objs as go
 import networkx as nx
 
 import pandas as pd
+from functools import reduce
 
 
 def parse_contents(contents: str) -> pd.DataFrame:
@@ -29,29 +30,32 @@ def parse_contents(contents: str) -> pd.DataFrame:
         return pd.DataFrame([])
 
 
-def make_random_graph():
-    G = nx.random_geometric_graph(30, 0.125)
-    pos = nx.get_node_attributes(G, 'pos')
+def make_graph():
+    G = nx.Graph()
 
-    dmin = 1
-    ncenter = 0
+    nodes = [
+        (0, {'pos': (1, 0), 'name': 'Node 0'}),
+        (1, {'pos': (2, 0), 'name': 'Node 1'}),
+        (2, {'pos': (3, 0), 'name': 'Node 2'}),
+        (3, {'pos': (4, 0), 'name': 'Node 3'}),
+    ]
 
-    for n in pos:
-        x, y = pos[n]
-        d = (x - 0.5) ** 2 + (y - 0.5) ** 2
-        if d < dmin:
-            ncenter = n
-            dmin = d
+    edges = [(1, 2)]
 
-    p = nx.single_source_shortest_path_length(G, ncenter)
+    # Create graph
+    G.add_nodes_from(nodes)
+    G.add_edges_from(edges)
 
+
+    # Creates scatter plot
     edge_trace = go.Scatter(
         x=[],
         y=[],
-        line=dict(width=0.5, color='#888'),
+        line=dict(width=0.8, color='#888'),
         hoverinfo='none',
         mode='lines')
 
+    # Unpack nodes positions and make scatter
     for edge in G.edges():
         x0, y0 = G.node[edge[0]]['pos']
         x1, y1 = G.node[edge[1]]['pos']
@@ -67,27 +71,24 @@ def make_random_graph():
         marker=dict(
             color=[],
             size=10,
-            colorbar=dict(
-                thickness=15,
-                title='Node Connections',
-                xanchor='left',
-                titleside='right'
-            ),
+            # colorbar=dict(
+            #     thickness=15,
+            #     title='Node Connections',
+            #     xanchor='left',
+            #     titleside='right'
+            # ),
             line=dict(width=2)))
 
+    # Add nodes attributes
     for node in G.nodes():
         x, y = G.node[node]['pos']
         node_trace['x'] += tuple([x])
         node_trace['y'] += tuple([y])
-
-    for node, adjacencies in enumerate(G.adjacency()):
-        node_trace['marker']['color'] += tuple([len(adjacencies[1])])
-        node_info = '# of connections: ' + str(len(adjacencies[1]))
+        node_info = reduce(lambda a, b: f'{a} | {b}', [f'{k} : {v}' for k, v in G.node[node].items()])
         node_trace['text'] += tuple([node_info])
 
     return go.Figure(data=[edge_trace, node_trace],
                      layout=go.Layout(
-                         titlefont=dict(size=16),
                          showlegend=False,
                          hovermode='closest',
                          margin=dict(b=20, l=5, r=5, t=40),

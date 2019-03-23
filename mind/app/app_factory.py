@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import time
-
 import dash
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 
-# from app.helpers import parse_contents
 from app.components import MainGraph, Upload, Description, Vbar
 from app.helpers import parse_contents
 from app.solver import tsp
@@ -14,7 +12,7 @@ from app.solver import tsp
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
-def create_app(config):
+def create_app():
     """
     Dash app factory and layout definition
 
@@ -32,12 +30,12 @@ def create_app(config):
     app.layout = html.Div([
         html.Div(children=[
             Description.component,
-            html.H3('Upload files for tsp solver'),
+            html.H3('Upload files for tsp solver', style={'margin-top': '40px'}),
             Vbar.component,
             html.Table(children=[
                 html.Tr(children=[
                     html.Td(children=[
-                        Upload(idx='city-matrix-input', name='Upload city matrix').component,
+                        Upload(idx='city-matrix-input', name='First upload city-matrix...').component,
                         html.Div(id='output-city-matrix')],
                         style={'width': '33%', 'vertical-align': 'top'}),
                     html.Td(children=[
@@ -67,7 +65,7 @@ def create_app(config):
                 return [html.Div(['Only .csv files ar supported!']), []]
 
             return [html.P(f'File {name} successfully uploaded!'),
-                    Upload(idx='coordinates-input', name='Upload cities coordinates').component]
+                    Upload(idx='coordinates-input', name='...now we need coordinates...').component]
         return None, None
 
     @app.callback([Output('output-coordinates', 'children'),
@@ -80,7 +78,7 @@ def create_app(config):
                 return [html.Div(['Only .csv files ar supported!']), []]
 
             return [html.P(f'File {name} successfully uploaded!'),
-                    Upload(idx='info-input', name='Upload additional info').component]
+                    Upload(idx='info-input', name='...finally add some info').component]
         return None, None
 
     @app.callback([Output('output-info', 'children'),
