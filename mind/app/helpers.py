@@ -3,43 +3,30 @@ import io
 import plotly.graph_objs as go
 import networkx as nx
 
-import dash_html_components as html
 import pandas as pd
 
 
-def parse_contents(contents: str, filename: str, date):
+def parse_contents(contents: str) -> pd.DataFrame:
     """
     Helper for parsing uploaded .csv file
 
     Parameters
     ----------
     contents
-    filename
-    date
 
     Returns
     -------
 
     """
-    from app.components import UploadedTable
-
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     try:
-        if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')))
-        else:
-            return html.Div(['Only .csv files ar supported!'])
-
+        # Assume that the user uploaded a CSV file
+        df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+        return df
     except Exception as e:
         print(e)
-        return html.Div([
-            'There was an error processing this file.'
-        ])
-
-    return UploadedTable(contents, filename, date, df).component
+        return pd.DataFrame([])
 
 
 def make_random_graph():
@@ -105,6 +92,7 @@ def make_random_graph():
                          hovermode='closest',
                          margin=dict(b=20, l=5, r=5, t=40),
                          annotations=[dict(
+                             text='',
                              showarrow=False,
                              xref="paper", yref="paper",
                              x=0.005, y=-0.002)],

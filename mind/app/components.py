@@ -21,6 +21,8 @@ class Upload:
             html.P(name),
             dcc.Upload(
                 id=idx,
+                contents=None,
+                filename=None,
                 children=html.Div([
                     'Drag and Drop or ',
                     html.A('Select Files')
@@ -60,3 +62,19 @@ class UploadedTable:
             })
         ])
 
+
+class Description:
+    component = dcc.Markdown('''
+### Some nice description and technical info
+
+Dash supports [Markdown](http://commonmark.org/help).
+
+Markdown is a simple way to write and format text.
+It includes a syntax for things like **bold text** and *italics*,
+[links](http://commonmark.org/help), inline `code` snippets, lists,
+quotes, and more.
+        ''')
+
+
+class Vbar:
+    component = html.Div(style={'height': '3px', 'background-color': '#1EAEDB'})
