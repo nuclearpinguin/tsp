@@ -11,6 +11,8 @@ class TestApp:
 
     def test_callback(self):
         callbacks = self.app.callback_map
+        assert len(list(callbacks)) == 4
+
         for k, v in callbacks.items():
             assert 'inputs' in v.keys()
             assert 'state' in v.keys()
