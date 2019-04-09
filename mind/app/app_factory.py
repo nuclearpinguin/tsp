@@ -5,7 +5,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 
-from app.components import MainGraph, Upload, Description, Vbar
+from app.components import MainGraph, Upload, Description, Vbar, HoursInput
 from app.helpers import parse_contents
 from app.solver import tsp
 
@@ -18,7 +18,6 @@ def create_app():
 
     Parameters
     ----------
-    config
 
     Returns
     -------
@@ -35,84 +34,78 @@ def create_app():
             html.Table(children=[
                 html.Tr(children=[
                     html.Td(children=[
-                        Upload(idx='city-matrix-input', name='First upload city-matrix...').component,
-                        html.Div(id='output-city-matrix')],
+                        Upload(idx='input-city', name='First upload city-matrix...').component,
+                        html.Div(id='output-city')],
                         style={'width': '33%', 'vertical-align': 'top'}),
                     html.Td(children=[
-                        html.Div(id='coordinates-input'),
+                        Upload(idx='input-coordinates', name='...now we need coordinates...').component,
                         html.Div(id='output-coordinates')],
                         style={'width': '33%', 'vertical-align': 'top'}),
-                    html.Td(children=[
-                        html.Div(id='info-input'),
-                        html.Div(id='output-info')],
-                        style={'width': '33%', 'vertical-align': 'top'}),
+                    html.Td(children=[HoursInput.component], style={'width': '33%', 'vertical-align': 'top'}),
                 ])
             ], style={'width': '100%', 'height': '100px'}),
-            html.Button('Solve!', id='solve-btn', style={'display': 'none'}, n_clicks=0),
         ]),
         html.Div(children=[
             dcc.Loading([html.Div(id='tsp-graph')], color='#1EAEDB')
         ], style={'margin-top': '40px'})
     ], style={'width': '85%', 'margin-left': '7.5%'})
 
-    @app.callback([Output('output-city-matrix', 'children'),
-                  Output('coordinates-input', 'children')],
-                  [Input('city-matrix-input', 'contents')],
-                  [State('city-matrix-input', 'filename')])
-    def upload_city_matrix(content, name):
+    # Upload first csv file with time between cities
+    @app.callback(Output('output-city', 'children'),
+                  [Input('input-city', 'contents')],
+                  [State('input-city', 'filename')])
+    def upload_city(content, name):
         if content is not None:
             if '.csv' not in name:
-                return [html.Div(['Only .csv files ar supported!']), []]
+                return html.Div(['Only .csv files ar supported!'])
+            return html.P(f'File {name} successfully uploaded!')
+        return None
 
-            return [html.P(f'File {name} successfully uploaded!'),
-                    Upload(idx='coordinates-input', name='...now we need coordinates...').component]
-        return None, None
-
-    @app.callback([Output('output-coordinates', 'children'),
-                  Output('info-input', 'children')],
-                  [Input('coordinates-input', 'contents')],
-                  [State('coordinates-input', 'filename')])
+    # Upload cities coordinates
+    @app.callback(Output('output-coordinates', 'children'),
+                  [Input('input-coordinates', 'contents')],
+                  [State('input-coordinates', 'filename')])
     def upload_coordinates(content, name):
         if content is not None:
             if '.csv' not in name:
-                return [html.Div(['Only .csv files ar supported!']), []]
+                return html.Div(['Only .csv files ar supported!'])
+            return html.P(f'File {name} successfully uploaded!')
+        return None
 
-            return [html.P(f'File {name} successfully uploaded!'),
-                    Upload(idx='info-input', name='...finally add some info').component]
-        return None, None
-
-    @app.callback([Output('output-info', 'children'),
+    # Activate solver button if both csv are present
+    @app.callback([Output('solve-btn', 'disabled'),
                    Output('solve-btn', 'style')],
-                  [Input('info-input', 'contents')],
-                  [State('info-input', 'filename')])
-    def upload_info(content, name):
-        if content is not None:
-            if '.csv' not in name:
-                return [html.Div(['Only .csv files ar supported!']), {'visibility': 'hidden'}]
+                  [Input('input-city', 'contents'),
+                   Input('input-coordinates', 'contents')])
+    def activate_solver(cities, coords):
+        style = {
+            'margin-top': '20px',
+            'background-color': 'grey',
+            'color': 'white'}
 
-            return [html.P(f'File {name} successfully uploaded!'),
-                    {'margin-top': '20px', 'visibility': 'visible',
-                     'float': 'right', 'background-color': '#1EAEDB', 'color': 'white'}]
+        if cities and coords:
+            style['background-color'] = '#1EAEDB'
+            return False, style
+        return True, style
 
-        return None, {'visibility': 'hidden'}
-
+    # Run solver
     @app.callback(Output('tsp-graph', 'children'),
                   [Input('solve-btn', 'n_clicks'),
-                   Input('city-matrix-input', 'contents'),
-                   Input('coordinates-input', 'contents'),
-                   Input('info-input', 'contents')])
-    def show_graph(n_clicks, city, coords, info):
+                   Input('input-city', 'contents'),
+                   Input('input-coordinates', 'contents'),
+                   Input('hours-number', 'value')])
+    def show_graph(n_clicks, city, coords, hours):
         if n_clicks is not None \
                 and city is not None \
                 and coords is not None \
-                and info is not None \
+                and hours is not None \
                 and n_clicks > 0:
             # to check loading
             time.sleep(2)
 
             graph_data = tsp(cities=parse_contents(city),
                              coords=parse_contents(coords),
-                             info=parse_contents(info))
+                             hours=hours)
 
             return [html.H3(children='The magic TSP graph'), Vbar.component, MainGraph.component]
 

@@ -23,7 +23,7 @@ def make_matrix(df: pd.DataFrame) -> np.ndarray:
     assert 'to' in df.columns, "The input dataframe must have 'to' column"
     assert 'time' in df.columns, "The input dataframe must have 'time' column"
 
-    cities = np.sort(np.unique(np.concatenate( [df['from'].unique(), df['to'].unique()])))
+    cities = np.sort(np.unique(np.concatenate([df['from'].unique(), df['to'].unique()])))
     n = cities.size
     mat = np.zeros((n, n))
     for i, c1 in enumerate(cities):
@@ -36,13 +36,11 @@ def make_matrix(df: pd.DataFrame) -> np.ndarray:
 
 
 # tsp solver
-def tsp(cities: pd.DataFrame, coords: pd.DataFrame, info: pd.DataFrame):
+def tsp(cities: pd.DataFrame, coords: pd.DataFrame, hours: int):
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(coords, pd.DataFrame), 'Wrong data format!'
-    assert isinstance(info, pd.DataFrame), 'Wrong data format!'
 
     print(cities.head())
     print(coords.head())
-    print(info.head())
-    print('Works')
+    print(hours)
 

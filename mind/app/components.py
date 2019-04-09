@@ -22,6 +22,7 @@ class Upload:
             dcc.Upload(
                 id=idx,
                 contents=None,
+                multiple=False,
                 filename=None,
                 children=html.Div([
                     'Drag and Drop or ',
@@ -39,6 +40,21 @@ class Upload:
                 },
             )
         ])
+
+
+class HoursInput:
+    component = html.Div([
+            html.P("... and finally the number of working hours"),
+            dcc.Input(id='hours-number', type='text', value='12'),
+            html.Button('Solve!',
+                        id='solve-btn',
+                        n_clicks=0,
+                        disabled=True,
+                        style={
+                            'margin-top': '20px',
+                            'background-color': 'grey',
+                            'color': 'white'}),
+            ])
 
 
 class UploadedTable:
