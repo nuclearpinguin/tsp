@@ -32,6 +32,7 @@ def parse_contents(contents: str) -> pd.DataFrame:
 
 def make_graph():
     G = nx.Graph()
+    # TODO: show graph and after solving show path
 
     nodes = [
         (0, {'pos': (1, 0), 'name': 'Node 0'}),
@@ -40,7 +41,7 @@ def make_graph():
         (3, {'pos': (4, 0), 'name': 'Node 3'}),
     ]
 
-    edges = [(1, 2)]
+    edges = [(1, 2), (2,3)]
 
     # Create graph
     G.add_nodes_from(nodes)
@@ -59,6 +60,7 @@ def make_graph():
     for edge in G.edges():
         x0, y0 = G.node[edge[0]]['pos']
         x1, y1 = G.node[edge[1]]['pos']
+
         edge_trace['x'] += tuple([x0, x1, None])
         edge_trace['y'] += tuple([y0, y1, None])
 
