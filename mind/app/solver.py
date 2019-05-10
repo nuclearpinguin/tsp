@@ -2,54 +2,20 @@ import numpy as np
 import pandas as pd
 import random
 
-
-class Path:
-    """ This class defines how path is represented."""
-
-    def __init__(self, sum=0, time=0, n=0):
-        """ Initializes attributes. """
-        self.path = []
-        self.distinct_path = []
-        self.sum = sum
-        self.time = time
-        self.number_of_visited_cities = n
-
-    def add_city(self, city, value, travel_time=0):
-        """ Modifies attributes when adding a city to a path. """
-        if city not in self.path:
-            self.distinct_path.append(city)
-            self.sum += value
-            self.number_of_visited_cities += 1
-        self.path.append(city)
-        self.time += travel_time
-
-    def __repr__(self):
-        """ Defines what is displayed when object_name is called. """
-        return "Path()"
-
-    def __str__(self):
-        """ Defines how print(object_name) is displayed. """
-        return "Path: " + str(self.path) + "\n" + \
-               "Distinct path: " + str(self.distinct_path) + "\n" + \
-               "Sum: " + str(self.sum) + "\n" + \
-               "Time: " + str(self.time) + "\n" + \
-               "Number of visited cities: " + str(self.number_of_visited_cities) + "\n"
-
-
 class City:
     """ This class defines how city is represented. """
 
-    def __init__(self, name="", x=None, y=None, value=0, neighbours={}):
+    def __init__(self, name, x, y, value=0):
         """ Initializes attributes. """
         self.name = name
         self.x = x
         self.y = y
         self.value = value
-        self.neighbours = neighbours
+        self.neighbours = {}
         self.visited = False
 
     def getCoords(self, df_cities):
-        self.x = df_cities.loc[df_cities['ID']]
+        self.x = df_cities.loc[df_cities['name']]
 
     def getNeighbours(self, d=dict()):
         self.neighbours = d.get(self.name, {})   # get the dictionary of pairs {neighbour:travel_time}
@@ -71,7 +37,7 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame):
     """
 
     dict_paths = {}
-    for city in df_cities['ID']:
+    for city in df_cities['name']:
         # get lists of neighbours of city
         neighbours_keys = list(df_paths.loc[df_paths['city_from'] == city]['city_to']) + \
                           list(df_paths.loc[df_paths['city_to'] == city]['city_from'])
@@ -124,7 +90,7 @@ def find_best_of_random_paths(df_cities: pd.DataFrame, df_paths: pd.DataFrame, d
     cities_list = {}
 
     for k in d.keys():
-        vec = df_cities.loc[df_cities['ID'] == k].values[0]
+        vec = df_cities.loc[df_cities['name'] == k].values[0]
         c = City(k, vec[1], vec[2], vec[3])
         c.getNeighbours(d)
         cities_list[k] = c
@@ -147,16 +113,14 @@ def find_best_of_random_paths(df_cities: pd.DataFrame, df_paths: pd.DataFrame, d
 
 
 # tsp solver
-def tsp(cities: pd.DataFrame, coords: pd.DataFrame, info: int):
+def tsp(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
-    assert isinstance(coords, pd.DataFrame), 'Wrong data format!'
-    # assert isinstance(info, pd.DataFrame), 'Wrong data format!'
-
-    df_time = pd.DataFrame([{'time': 12}])
+    assert isinstance(paths, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(time, pd.DataFrame), 'Wrong data format!'
 
     time_left, total, pth = find_best_of_random_paths(df_cities=cities,
-                                                      df_paths=coords,
-                                                      df_time=df_time)
+                                                      df_paths=paths,
+                                                      df_time=time)
 
     print(f'Time left : {time_left}')
     print(f'Earned : {total}')

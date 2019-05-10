@@ -1,19 +1,20 @@
 import base64
 import io
 import plotly.graph_objs as go
-from plotly.graph_objs.scatter import Marker
+from plotly.graph_objs.scattergl import Marker
 import networkx as nx
 from typing import List, Tuple
 import pandas as pd
 from functools import reduce
 from random import randint
+from time import time as now
 
 from .solver import City
 
 
 def prepare_data(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
-    cities = [City(name, x, y, q) for name, x, y, q in cities.values]
-    edges = [(from_c, to_c, {'time': t, 'solution': randint(0, 1)}) for from_c, to_c, t in paths.values]
+    cities = (City(name, x, y, q) for name, x, y, q in cities.values)
+    edges = ((from_c, to_c, {'time': t, 'solution': randint(0, 1)}) for from_c, to_c, t in paths.values)
     return cities, edges
 
 
@@ -49,62 +50,83 @@ def _color_edge(info: dict) -> dict:
 def make_graph(cities: List[City], edges: List[Tuple[str, str]]):
     G = nx.Graph()
 
-    nodes = [(city.name, {'pos': (city.x, city.y), 'name': city.name, 'quantity': city.value}) for city in cities]
+    nodes = ((city.name, {'pos': (city.x, city.y), 'name': city.name, 'quantity': city.value}) for city in cities)
 
     # Create graph
     G.add_nodes_from(nodes)
     G.add_edges_from(edges)
 
-    # Hack for info hover on edges:
-    middle_node_trace = go.Scatter(
-        x=[],
-        y=[],
-        text=[],
-        mode='markers',
-        hoverinfo='text',
-        marker=Marker(opacity=0)
-    )
+    # Hack
+    edge_labels_x = []
+    edge_labels_y = []
+    edge_labels_txt = []
+
+    # Define appends for better performance
+    add_x = edge_labels_x.append
+    add_y = edge_labels_y.append
+    add_txt = edge_labels_txt.append
+
+    tic = now()
 
     # Create edges plot
     edge_traces = []
+    add = edge_traces.append
     for edge in G.edges(data=True):
         a, b, info = edge
         x0, y0 = G.node[a]['pos']
         x1, y1 = G.node[b]['pos']
-        trace = go.Scatter(
+        trace = go.Scattergl(
             x=[x0, x1, None],
             y=[y0, y1, None],
             line=_color_edge(info),
             hoverinfo='none',
             mode='lines'
         )
-        edge_traces.append(trace)
+        add(trace)
+        add_x((x0 + x1) / 2)
+        add_y((y0 + y1) / 2)
+        add_txt(f"time: {info['time'] }")
 
-        # Create magic hover info on edge
-        middle_node_trace['x'] += tuple([(x0 + x1) / 2])
-        middle_node_trace['y'] += tuple([(y0 + y1) / 2])
-        middle_node_trace['text'] += tuple([f"time: {info['time'] }"])
+    print(f'edges : {now() - tic}')
 
-    node_trace = go.Scatter(
+    # Hack for info hover on edges:
+    middle_node_trace = go.Scattergl(
+        x=edge_labels_x,
+        y=edge_labels_y,
+        text=edge_labels_txt,
+        mode='markers',
+        hoverinfo='text',
+        marker=Marker(opacity=0)
+    )
+
+    node_trace = go.Scattergl(
         x=[],
         y=[],
         text=[],
         mode='markers',
         hoverinfo='text',
-        marker=dict(
+        marker=Marker(
             color=[],
             size=10,
-            line=dict(width=2)))
+            line=dict(width=2))
+    )
+
+    tic = now()
 
     # Create nodes plot
     for node in G.nodes():
-        x, y = G.node[node]['pos']
+        the_node = G.node[node]
+        x, y = the_node['pos']
         node_trace['x'] += tuple([x])
         node_trace['y'] += tuple([y])
-        node_info = reduce(lambda a, b: f'{a} | {b}', [f'{k} : {v}' for k, v in G.node[node].items()])
+        node_info = reduce(lambda a, b: f'{a} | {b}', [f'{k} : {v}' for k, v in the_node.items()])
         node_trace['text'] += tuple([node_info])
 
-    return go.Figure(data=[*edge_traces, node_trace, middle_node_trace],
+    print(f'edges : {now() - tic}')
+
+    data = edge_traces + [node_trace, middle_node_trace]
+
+    return go.Figure(data=data,
                      layout=go.Layout(
                          showlegend=False,
                          hovermode='closest',

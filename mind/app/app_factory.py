@@ -4,6 +4,7 @@ import dash
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
+import pandas as pd
 
 from app.components import graph, vbar, upload, description
 from app.helpers import parse_contents, prepare_data
@@ -108,13 +109,18 @@ def create_app():
                 and info is not None \
                 and n_clicks > 0:
             tic = time.time()
-            # graph_data = tsp(cities=parse_contents(city),
-            #                  coords=parse_contents(coords),
-            #                  info=parse_contents(info))
+            df_time = pd.DataFrame([{'time': info}])
 
+            graph_data = tsp(cities=parse_contents(city),
+                             paths=parse_contents(coords),
+                             time=df_time)
+            print(f'Solve: {time.time() - tic}')
+
+            tic = time.time()
             cities, edges = prepare_data(cities=parse_contents(city),
                                          paths=parse_contents(coords),
                                          time=parse_contents(info))
+
             print(f'Prepare data: {time.time() - tic}')
 
             tic = time.time()
