@@ -2,21 +2,21 @@ import time
 import pandas as pd
 
 from app.solver import tsp
-from mind.generator import generate_csv
+from mind.generator import generate_csv, validate_input
 
 
 def check_time(size: int):
     name = 'time_test'
 
     tic = time.time()
-    generate_csv(size=size, filename=name)
+    city, paths = generate_csv(size=size, filename=name)
     print(f'Prepare data: {time.time() - tic}')
 
     tic = time.time()
-    city = pd.read_csv(f'{name}_cities.csv')
-    paths = pd.read_csv(f'{name}_paths.csv')
+    print(validate_input(city, paths))
+    print(f'Validation time: {time.time() - tic}')
 
-    print(f'Cities number: {city.shape[0]}')
+    tic = time.time()
     # graph_data = tsp(cities=city,
     #                  coords=paths,
     #                  info=20)
@@ -25,6 +25,6 @@ def check_time(size: int):
 
 
 if __name__ == '__main__':
-    check_time(5000)
+    check_time(500)
 
 
