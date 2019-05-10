@@ -2,42 +2,16 @@ import numpy as np
 import pandas as pd
 import random
 
-
-class Path:
-    """ This class defines how path is represented."""
-
-    def __init__(self, sum=0, time=0, n=0):
-        """ Initializes attributes. """
-        self.path = []
-        self.distinct_path = []
-        self.sum = sum
-        self.time = time
-        self.number_of_visited_cities = n
-
-    def add_city(self, city, value, travel_time=0):
-        """ Modifies attributes when adding a city to a path. """
-        if city not in self.path:
-            self.distinct_path.append(city)
-            self.sum += value
-            self.number_of_visited_cities += 1
-        self.path.append(city)
-        self.time += travel_time
-
-    def __repr__(self):
-        """ Defines what is displayed when object_name is called. """
-        return "Path()"
-
-    def __str__(self):
-        """ Defines how print(object_name) is displayed. """
-        return "Path: " + str(self.path) + "\n" + \
-               "Distinct path: " + str(self.distinct_path) + "\n" + \
-               "Sum: " + str(self.sum) + "\n" + \
-               "Time: " + str(self.time) + "\n" + \
-               "Number of visited cities: " + str(self.number_of_visited_cities) + "\n"
-
-
 class City:
     """ This class defines how city is represented. """
+
+    #TODO
+    """
+    - metoda sprawdzająca, czy miasta są sąsiadami (może przeciążenie operatora)
+    - get_coords zamiast getCoords
+    - poprawić docstringi (: pd.DataFrame)
+    - type adnotation, typing adnotation
+    """
 
     def __init__(self, name="", x=None, y=None, value=0, neighbours={}):
         """ Initializes attributes. """
@@ -69,6 +43,9 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame):
     :param df_paths: pandas.read_csv("paths.csv")
     :return: dictionary {city: {neighbour : time_to_neighbour}}
     """
+
+    #TODO
+    #pokminić z
 
     dict_paths = {}
     for city in df_cities['ID']:
@@ -108,7 +85,8 @@ def find_random_path(cities_list, starting_city, time_left):
 
         # set city we travelled to as a current city
         curr_city = cities_list[next_city]
-
+    #TODO
+    # spróbować to zwracać jako tuple return time_left, sum, path
     return [time_left, sum, path]
 
 
