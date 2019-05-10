@@ -5,8 +5,8 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 
-from app.components import MainGraph, Upload, Description, Vbar
-from app.helpers import parse_contents
+from app.components import graph, vbar, upload, description
+from app.helpers import parse_contents, prepare_data
 from app.solver import tsp
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -29,13 +29,13 @@ def create_app():
 
     app.layout = html.Div([
         html.Div(children=[
-            Description.component,
+            description(),
             html.H3('Upload files for tsp solver', style={'margin-top': '40px'}),
-            Vbar.component,
+            vbar(),
             html.Table(children=[
                 html.Tr(children=[
                     html.Td(children=[
-                        Upload(idx='city-matrix-input', name='First upload city-matrix...').component,
+                        upload(idx='city-matrix-input', name='First upload city-matrix...'),
                         html.Div(id='output-city-matrix')],
                         style={'width': '33%', 'vertical-align': 'top'}),
                     html.Td(children=[
@@ -65,7 +65,7 @@ def create_app():
                 return [html.Div(['Only .csv files ar supported!']), []]
 
             return [html.P(f'File {name} successfully uploaded!'),
-                    Upload(idx='coordinates-input', name='...now we need coordinates...').component]
+                    upload(idx='coordinates-input', name='...now we need coordinates...')]
         return None, None
 
     @app.callback([Output('output-coordinates', 'children'),
@@ -78,7 +78,7 @@ def create_app():
                 return [html.Div(['Only .csv files ar supported!']), []]
 
             return [html.P(f'File {name} successfully uploaded!'),
-                    Upload(idx='info-input', name='...finally add some info').component]
+                    upload(idx='info-input', name='...finally add some info')]
         return None, None
 
     @app.callback([Output('output-info', 'children'),
@@ -107,13 +107,19 @@ def create_app():
                 and coords is not None \
                 and info is not None \
                 and n_clicks > 0:
-            # to check loading
-            time.sleep(2)
+            tic = time.time()
+            # graph_data = tsp(cities=parse_contents(city),
+            #                  coords=parse_contents(coords),
+            #                  info=parse_contents(info))
 
-            graph_data = tsp(cities=parse_contents(city),
-                             coords=parse_contents(coords),
-                             info=parse_contents(info))
+            cities, edges = prepare_data(cities=parse_contents(city),
+                                         paths=parse_contents(coords),
+                                         time=parse_contents(info))
+            print(f'Prepare data: {time.time() - tic}')
 
-            return [html.H3(children='The magic TSP graph'), Vbar.component, MainGraph.component]
+            tic = time.time()
+            plot = graph(cities, edges)
+            print(f'Prepare graph: {time.time() - tic}')
+            return [html.H3(children='The magic TSP graph'), vbar(), plot]
 
     return app

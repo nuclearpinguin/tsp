@@ -8,63 +8,65 @@ import datetime
 from app.helpers import make_graph
 
 
-class MainGraph:
-    component = dcc.Graph(
-            id='example-graph',
-            figure=make_graph()
+def graph(cities, edges):
+    return dcc.Graph(
+        id='example-graph',
+        figure=make_graph(cities, edges),
+        style={
+            'width': '100%',
+            'height': '1000px',
+        }
+    )
+
+
+def upload(idx: str, name: str = 'Select Files'):
+    return html.Div([
+        html.P(name),
+        dcc.Upload(
+            id=idx,
+            contents=None,
+            filename=None,
+            children=html.Div([
+                'Drag and Drop or ',
+                html.A('Select Files')
+            ]),
+            style={
+                'width': '100%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px'
+            },
         )
+    ])
 
 
-class Upload:
-    def __init__(self, idx: str, name: str = 'Select Files'):
-        self.component = html.Div([
-            html.P(name),
-            dcc.Upload(
-                id=idx,
-                contents=None,
-                filename=None,
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files')
-                ]),
-                style={
-                    'width': '100%',
-                    'height': '60px',
-                    'lineHeight': '60px',
-                    'borderWidth': '1px',
-                    'borderStyle': 'dashed',
-                    'borderRadius': '5px',
-                    'textAlign': 'center',
-                    'margin': '10px'
-                },
-            )
-        ])
+def upload_table(contents: str, filename: str, time_stamp: int, df: pd.DataFrame):
+    return html.Div([
+        html.H5(filename),
+        html.H6(datetime.datetime.fromtimestamp(time_stamp)),
+
+        dash_table.DataTable(
+            data=df.to_dict('rows'),
+            columns=[{'name': i, 'id': i} for i in df.columns]
+        ),
+
+        html.Hr(),  # horizontal line
+
+        # For debugging, display the raw contents provided by the web browser
+        html.Div('Raw Content'),
+        html.Pre(contents[0:200] + '...', style={
+            'whiteSpace': 'pre-wrap',
+            'wordBreak': 'break-all'
+        })
+    ])
 
 
-class UploadedTable:
-    def __init__(self, contents: str, filename: str, time_stamp: int, df: pd.DataFrame):
-        self.component = html.Div([
-            html.H5(filename),
-            html.H6(datetime.datetime.fromtimestamp(time_stamp)),
-
-            dash_table.DataTable(
-                data=df.to_dict('rows'),
-                columns=[{'name': i, 'id': i} for i in df.columns]
-            ),
-
-            html.Hr(),  # horizontal line
-
-            # For debugging, display the raw contents provided by the web browser
-            html.Div('Raw Content'),
-            html.Pre(contents[0:200] + '...', style={
-                'whiteSpace': 'pre-wrap',
-                'wordBreak': 'break-all'
-            })
-        ])
-
-
-class Description:
-    component = dcc.Markdown('''
+def description():
+    return dcc.Markdown('''
 ### About the Traveling Salesman Problem
 
 Given a list of cities and the distances between each pair of cities, 
@@ -81,5 +83,5 @@ This app allows you to solve the problem. But first you have to upload three fil
         ''')
 
 
-class Vbar:
-    component = html.Div(style={'height': '3px', 'background-color': '#1EAEDB'})
+def vbar():
+    return html.Div(style={'height': '3px', 'background-color': '#1EAEDB'})
