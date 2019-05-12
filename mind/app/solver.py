@@ -1,18 +1,13 @@
 import numpy as np
 import pandas as pd
 import random
-from typing import List, Tuple, NewType
+import time
+from typing import List, Tuple
+from collections import namedtuple
 
 
 class City:
     """ This class defines how city is represented. """
-
-    #TODO
-    """
-    - metoda sprawdzająca, czy miasta są sąsiadami (może przeciążenie operatora)
-    - poprawić docstringi (: pd.DataFrame)
-    - type annotation
-    """
 
     def __init__(self, name: str, x: int, y: int, value: int = 0) -> None:
         """ Initializes attributes. """
@@ -37,25 +32,18 @@ class City:
                f"Ngbrs: {self.neighbours}\n"
 
 
-# Define new types for typing
-#TODO
-# doesn't work :<
-"""
-City = NewType('City', City)
-CitiesDict = NewType('CitiesDict', dict)
-Output = NewType('Output', Tuple[int, int, List[City]])
-"""
+Output = namedtuple('Output', ['time_left', 'total', 'path'])
 
-def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame): # -> CitiesDict:
+
+def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     """
-    Converts data frames of cities and paths to a dictionary {city: {neighbour : time_to_neighbour}}.
+    Converts data frames of cities and paths to a dictionary
+    {city: {neighbour : time_to_neighbour}}.
+
     :param df_cities: pandas.read_csv("cities.csv")
     :param df_paths: pandas.read_csv("paths.csv")
     :return: dictionary {city: {neighbour : time_to_neighbour}}
     """
-
-    #TODO
-    # pokminić z listami, czy nie da się tego prościej
 
     dict_paths = {}
     for city in df_cities['name']:
@@ -71,7 +59,7 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame): # -> Citie
     return dict_paths
 
 
-def find_random_path(cities_list: dict, starting_city: City, time_left: int): # -> Output:
+def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> Output:
     """ Generates a list containing: time, total and random path. """
 
     path = []
@@ -81,6 +69,11 @@ def find_random_path(cities_list: dict, starting_city: City, time_left: int): # 
 
     while tmp_time > 0:
         time_left = tmp_time
+
+        #TODO
+        # change this to:
+        # for city in cities:
+        #   c_copy = cities_list.copy()
         if curr_city not in path:
             # city value is added only once
             total += curr_city.value
@@ -96,12 +89,11 @@ def find_random_path(cities_list: dict, starting_city: City, time_left: int): # 
 
         # set city we travelled to as a current city
         curr_city = cities_list[next_city]
-    #TODO
-    # spróbować to zwracać jako tuple return time_left, sum, path
-    return time_left, total, path
+
+    return Output(time_left, total, path)
 
 
-def find_best_of_random_paths(d: dict, working_time: int, n=50): # -> Output:
+def find_best_of_random_paths(cities_dict: dict, working_time: int, n=50) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
     :param d: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
@@ -110,10 +102,13 @@ def find_best_of_random_paths(d: dict, working_time: int, n=50): # -> Output:
     """
 
     best_paths = []
-    for starting_city in list(d.keys()):
+    for starting_city in cities_dict.keys():
         lst = []
+
+        # for better performance define
+        add = lst.append
         for i in range(n):
-            lst.append(find_random_path(d, starting_city, working_time))
+            add(find_random_path(cities_dict, starting_city, working_time))
 
         # sort list [time_left, total, path] by total, descending
         lst.sort(key=lambda x: x[1], reverse=True)
@@ -122,6 +117,13 @@ def find_best_of_random_paths(d: dict, working_time: int, n=50): # -> Output:
     best_paths.sort(key=lambda x: x[1], reverse=True)
 
     return best_paths[0]
+
+
+def convert_to_edges_list(paths: list):
+    path = [(cf.name, ct.name, cf.neighbours[ct.name])
+            for cf, ct in zip(paths[:-1], paths[1:])]
+
+    return path
 
 
 # tsp solver
@@ -150,13 +152,20 @@ def tsp(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame):
     # data validation
 
     # compute the best path
-    time_left, total, pth = find_best_of_random_paths(cities_dict, working_time)
+    time_left, total, pth = find_best_of_random_paths(cities_dict, working_time, 100)
+
+    out = convert_to_edges_list(pth)
 
     print(f'Time left: {time_left}')
     print(f'Earned:    {total}')
     print("Best found path:")
 
     for item in pth:
+        print(item)
+
+    print("--------------------------")
+
+    for item in out:
         print(item)
 
 # Test
@@ -167,5 +176,8 @@ cities = pd.read_csv(main_path + "cities.csv")
 edges = pd.read_csv(main_path + "paths.csv")
 work_time = pd.read_csv(main_path + "time.csv")
 
-
+start = time.time()
 tsp(cities, edges, work_time)
+stop = time.time()
+
+print(f"Exec time: {stop-start}")
