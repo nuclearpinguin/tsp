@@ -1,21 +1,19 @@
 import base64
 import io
 import plotly.graph_objs as go
-from plotly.graph_objs.scattergl import Marker
+from plotly.graph_objs.scatter import Marker
 import networkx as nx
 from typing import List, Tuple
 import pandas as pd
 from functools import reduce
-from random import randint
 from time import time as now
 
 from .solver import City
 
 
-def prepare_data(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
-    cities = (City(name, x, y, q) for name, x, y, q in cities.values)
-    edges = ((from_c, to_c, {'time': t, 'solution': randint(0, 1)}) for from_c, to_c, t in paths.values)
-    return cities, edges
+def prepare_data(cities: List[City]):
+    return [(city.name, {'pos': (city.x, city.y), 'name': city.name, 'quantity': city.value})
+            for city in cities]
 
 
 def parse_contents(contents: str) -> pd.DataFrame:
@@ -47,10 +45,8 @@ def _color_edge(info: dict) -> dict:
     return dict(width=0.8, color='#888')
 
 
-def make_graph(cities: List[City], edges: List[Tuple[str, str]]):
+def make_graph(nodes: List[City], edges: List[Tuple[str, str]]):
     G = nx.Graph()
-
-    nodes = ((city.name, {'pos': (city.x, city.y), 'name': city.name, 'quantity': city.value}) for city in cities)
 
     # Create graph
     G.add_nodes_from(nodes)
@@ -75,7 +71,7 @@ def make_graph(cities: List[City], edges: List[Tuple[str, str]]):
         a, b, info = edge
         x0, y0 = G.node[a]['pos']
         x1, y1 = G.node[b]['pos']
-        trace = go.Scattergl(
+        trace = go.Scatter(
             x=[x0, x1, None],
             y=[y0, y1, None],
             line=_color_edge(info),
@@ -90,7 +86,7 @@ def make_graph(cities: List[City], edges: List[Tuple[str, str]]):
     print(f'edges : {now() - tic}')
 
     # Hack for info hover on edges:
-    middle_node_trace = go.Scattergl(
+    middle_node_trace = go.Scatter(
         x=edge_labels_x,
         y=edge_labels_y,
         text=edge_labels_txt,
@@ -99,7 +95,7 @@ def make_graph(cities: List[City], edges: List[Tuple[str, str]]):
         marker=Marker(opacity=0)
     )
 
-    node_trace = go.Scattergl(
+    node_trace = go.Scatter(
         x=[],
         y=[],
         text=[],

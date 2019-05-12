@@ -1,11 +1,15 @@
 import numpy as np
 import pandas as pd
 import random
+import time
+from typing import List, Tuple
+from collections import namedtuple
+
 
 class City:
     """ This class defines how city is represented. """
 
-    def __init__(self, name, x, y, value=0):
+    def __init__(self, name: str, x: int, y: int, value: int = 0) -> None:
         """ Initializes attributes. """
         self.name = name
         self.x = x
@@ -14,23 +18,28 @@ class City:
         self.neighbours = {}
         self.visited = False
 
-    def getCoords(self, df_cities):
+    def set_coords(self, df_cities: pd.DataFrame) -> None:
         self.x = df_cities.loc[df_cities['name']]
 
-    def getNeighbours(self, d=dict()):
+    def set_neighbours(self, d: dict = dict()) -> None:
         self.neighbours = d.get(self.name, {})   # get the dictionary of pairs {neighbour:travel_time}
 
-    def __str__(self):
+    def __str__(self) -> str:
         """ Defines how print(object_name) is displayed. """
-        return "City: " + str(self.name) + "\n" + \
-               "Coord: (" + str(self.x) + ', ' +  str(self.y) + ")\n" + \
-               "Value: " + str(self.value) + "\n" + \
-               "Ngbrs: " + str(self.neighbours) + "\n"
+        return f"City: {self.name}\n" + \
+               f"Coord: ({self.x}, {self.y})\n" + \
+               f"Value: {self.value}\n" + \
+               f"Ngbrs: {self.neighbours}\n"
 
 
-def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame):
+Output = namedtuple('Output', ['time_left', 'total', 'path'])
+
+
+def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     """
-    Converts data frames of cities and paths to a dictionary {city: {neighbour : time_to_neighbour}}.
+    Converts data frames of cities and paths to a dictionary
+    {city: {neighbour : time_to_neighbour}}.
+
     :param df_cities: pandas.read_csv("cities.csv")
     :param df_paths: pandas.read_csv("paths.csv")
     :return: dictionary {city: {neighbour : time_to_neighbour}}
@@ -38,30 +47,36 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame):
 
     dict_paths = {}
     for city in df_cities['name']:
-        # get lists of neighbours of city
-        neighbours_keys = list(df_paths.loc[df_paths['city_from'] == city]['city_to']) + \
-                          list(df_paths.loc[df_paths['city_to'] == city]['city_from'])
+        # get lists of neighbours of the city
+        neighbours_keys = list(df_paths[df_paths['city_from'] == city]['city_to']) + \
+                          list(df_paths[df_paths['city_to'] == city]['city_from'])
         # get list of times needed to travel to each of them
-        neighbours_values = list(df_paths.loc[df_paths['city_from'] == city]['time']) + \
-                            list(df_paths.loc[df_paths['city_to'] == city]['time'])
+        neighbours_values = list(df_paths[df_paths['city_from'] == city]['time']) + \
+                            list(df_paths[df_paths['city_to'] == city]['time'])
         # then merge them
         dict_paths[city] = {key: value for key, value in zip(neighbours_keys, neighbours_values)}
+
     return dict_paths
 
 
-def find_random_path(cities_list, starting_city, time_left):
-    """ Generates a list containing: time, sum and random path. """
+def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> Output:
+    """ Generates a list containing: time, total and random path. """
 
     path = []
     tmp_time = time_left
-    sum = 0
+    total = 0
     curr_city = cities_list[starting_city]
 
     while tmp_time > 0:
         time_left = tmp_time
+
+        #TODO
+        # change this to:
+        # for city in cities:
+        #   c_copy = cities_list.copy()
         if curr_city not in path:
             # city value is added only once
-            sum += curr_city.value
+            total += curr_city.value
 
         # add city to a path
         path.append(curr_city)
@@ -75,35 +90,27 @@ def find_random_path(cities_list, starting_city, time_left):
         # set city we travelled to as a current city
         curr_city = cities_list[next_city]
 
-    return [time_left, sum, path]
+    return Output(time_left, total, path)
 
 
-def find_best_of_random_paths(df_cities: pd.DataFrame, df_paths: pd.DataFrame, df_time: pd.DataFrame, n=50):
+def find_best_of_random_paths(cities_dict: dict, working_time: int, n=50) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
+    :param d: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    :param working_time:
     :param n: number of trials for each vertex in random walk
     """
 
-    d = convert_to_dict(df_cities, df_paths)
-
-    # define empty dictionary containing {city_name : city_object}
-    cities_list = {}
-
-    for k in d.keys():
-        vec = df_cities.loc[df_cities['name'] == k].values[0]
-        c = City(k, vec[1], vec[2], vec[3])
-        c.getNeighbours(d)
-        cities_list[k] = c
-
-    time = df_time['time'].values[0]
-
     best_paths = []
-    for starting_city in list(d.keys()):
+    for starting_city in cities_dict.keys():
         lst = []
-        for i in range(n):
-            lst.append(find_random_path(cities_list, starting_city, time))
 
-        # sort list [time_left, sum, path] by sum (second element), descending
+        # for better performance define
+        add = lst.append
+        for i in range(n):
+            add(find_random_path(cities_dict, starting_city, working_time))
+
+        # sort list [time_left, total, path] by total, descending
         lst.sort(key=lambda x: x[1], reverse=True)
         best_paths.append(lst[0])
 
@@ -112,21 +119,50 @@ def find_best_of_random_paths(df_cities: pd.DataFrame, df_paths: pd.DataFrame, d
     return best_paths[0]
 
 
-# tsp solver
-def tsp(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
+def convert_to_edges_list(paths: list):
+    path = [(cf.name, ct.name)
+            for cf, ct in zip(paths[:-1], paths[1:])]
+    return path
+
+
+# solver
+def solve(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame):
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
-    assert isinstance(paths, pd.DataFrame), 'Wrong data format!'
-    assert isinstance(time, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(info, pd.DataFrame), 'Wrong data format!'
 
-    time_left, total, pth = find_best_of_random_paths(df_cities=cities,
-                                                      df_paths=paths,
-                                                      df_time=time)
+    # build a dictionary {city : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    d = convert_to_dict(cities, edges)
 
-    print(f'Time left : {time_left}')
-    print(f'Earned : {total}')
-    print("Best found path:")
+    # build a dict {city_name : City object}
+    cities_dict = {}
 
-    for item in pth:
-        print(item)
+    for k in d.keys():
+        # get: name, x, y, quantity
+        vec = cities[cities['name'] == k].values[0]
+        c = City(k, vec[1], vec[2], vec[3])
+        c.set_neighbours(d)
+        cities_dict[k] = c
+
+    # get working time from the data frame
+    working_time = info['time'].values[0]
+
+    #TODO
+    # data validation
+
+    # compute the best path
+    solution = find_best_of_random_paths(cities_dict, working_time, 50)
+
+    return solution, convert_to_edges_list(solution.path)
 
 
+def make_plot_data(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
+    solution, selected_edges = solve(cities, paths, time)
+
+    check = lambda fc, tc: ((fc, tc) in selected_edges) or ((tc, fc) in selected_edges)
+
+    cities = [City(name, x, y, q) for name, x, y, q in cities.values]
+    edges = ((from_c, to_c, {'time': t, 'solution': check(from_c, to_c)})
+             for from_c, to_c, t in paths.values)
+
+    return solution, cities, edges

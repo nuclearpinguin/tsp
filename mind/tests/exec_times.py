@@ -6,10 +6,10 @@ from mind.generator import generate_csv, validate_input
 
 
 def check_time(size: int):
-    name = 'time_test'
+    name = str(size)
 
     tic = time.time()
-    city, paths = generate_csv(size=size, filename=name)
+    city, paths = generate_csv(size=size, filename=name, save=True)
     print(f'Prepare data: {time.time() - tic}')
 
     tic = time.time()

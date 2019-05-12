@@ -3,6 +3,11 @@ import pandas as pd
 from time import sleep
 
 
+def unique(xs: list):
+    seen = set()  # < keep track of what we have seen as we go
+    unique_list = [x for x in xs if not ((x[0], x[1]) in seen or seen.add((x[0], x[1])))]
+    return unique_list
+
 def make_sample(size: int) -> list:
     x, y = randint(0, 100), randint(0, 100)
     start_point = (x, y, 'none')
@@ -11,7 +16,7 @@ def make_sample(size: int) -> list:
     step = max(1, size//10)
     while n < size:
         i = -1
-        cities = list(set(cities))
+        cities = unique(cities)
         n = len(cities)
         add_city = cities.append
         j = 0
@@ -23,7 +28,7 @@ def make_sample(size: int) -> list:
                 break
             j += 1
         sleep(0.0005)
-    return list(set(cities))
+    return unique(cities)
 
 
 def add_points(add_city: callable,
@@ -68,6 +73,7 @@ def generate_csv(size: int,
     df_cities['quantity'] = [randint(0, max_q) for _ in range(df_cities.shape[0])]
 
     df_edges = pd.DataFrame(find_edges(df_cities), columns=['city_from', 'city_to', 'time'])
+    df_cities = df_cities[['name', 'x', 'y', 'quantity']]
     if save:
         df_cities.to_csv(f'{filename}_cities.csv', index=False)
         df_edges.to_csv(f'{filename}_paths.csv', index=False)
@@ -102,6 +108,8 @@ def validate_input(cities: pd.DataFrame, paths: pd.DataFrame) -> tuple:
             return False, f"Distance between {city_from}-{city_to} is less than 0." \
                 f" We do not support time travellers yet :<"
 
+        if not isinstance(dist, int):
+            return False,
         cf = cities[cities.name == city_from]
         if cf.shape[0] != 1:
             return False, f"Whoops! No coordinates for city {city_from} :<"

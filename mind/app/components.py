@@ -1,11 +1,21 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
-
 import pandas as pd
-import datetime
+import numpy as np
 
 from app.helpers import make_graph
+
+
+def button(idx: str, txt: str, align: str = 'right'):
+    return html.Button(txt,
+                       id=idx,
+                       style={
+                           'margin-top': '20px',
+                           'float': align,
+                           'background-color': '#1EAEDB',
+                           'color': 'white'},
+                       n_clicks=0)
 
 
 def graph(cities, edges):
@@ -44,24 +54,38 @@ def upload(idx: str, name: str = 'Select Files'):
     ])
 
 
-def upload_table(contents: str, filename: str, time_stamp: int, df: pd.DataFrame):
-    return html.Div([
-        html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(time_stamp)),
+def stats(solve_time: float, plot_time: float, solution, cities):
+    return [
+        html.Table([
+            html.Tr([
+                html.Td([
+                    html.H6('STATS'),
+                    html.Li(html.P(f'Solving time: {solve_time:.4f}')),
+                    html.Li(html.P(f'Plotting time: {plot_time:.4f}')),
+                    ], style={'vertical-align': 'top'}),
+                html.Td([
+                    html.H6('SOLUTION:'),
+                    html.Li(html.P(f"Path: {', '.join([c.name for c in solution.path])}")),
+                    html.Li(html.P(f'Time left: {solution.time_left}')),
+                    html.Li(html.P(f'Earned / total: {solution.total}')),
+                    html.Li(html.P(f'Mean quantity: {float(np.mean([c.value for c in cities])):.2f}')),
+                ], style={'vertical-align': 'top'})
+            ])
+        ], style={'border': 'none'}),
+        button('save-btn', 'save', align='left'),
+    ]
 
+
+def upload_table(name: str, df: pd.DataFrame):
+    return html.Div([
+        html.P(f'File {name} successfully uploaded!'),
         dash_table.DataTable(
             data=df.to_dict('rows'),
-            columns=[{'name': i, 'id': i} for i in df.columns]
+            columns=[{'name': i, 'id': i} for i in df.columns],
+            style_cell={'textAlign': 'center', 'width': '150px'},
+            n_fixed_rows=1,
+            style_table={'maxHeight': '300px'},
         ),
-
-        html.Hr(),  # horizontal line
-
-        # For debugging, display the raw contents provided by the web browser
-        html.Div('Raw Content'),
-        html.Pre(contents[0:200] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
     ])
 
 
