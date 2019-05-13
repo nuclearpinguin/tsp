@@ -1,4 +1,4 @@
-from mind.generator import validate_input, generate_csv
+from generator import validate_input, generate_csv
 import pandas as pd
 
 

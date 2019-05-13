@@ -8,6 +8,7 @@ def unique(xs: list):
     unique_list = [x for x in xs if not ((x[0], x[1]) in seen or seen.add((x[0], x[1])))]
     return unique_list
 
+
 def make_sample(size: int) -> list:
     x, y = randint(0, 100), randint(0, 100)
     start_point = (x, y, 'none')

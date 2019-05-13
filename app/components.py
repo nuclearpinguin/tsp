@@ -54,25 +54,17 @@ def upload(idx: str, name: str = 'Select Files'):
     ])
 
 
-def stats(solve_time: float, plot_time: float, solution, cities):
+def stats(solve_time: float, solution, cities):
     return [
-        html.Table([
-            html.Tr([
-                html.Td([
-                    html.H6('STATS'),
-                    html.Li(html.P(f'Solving time: {solve_time:.4f}')),
-                    html.Li(html.P(f'Plotting time: {plot_time:.4f}')),
-                    ], style={'vertical-align': 'top'}),
-                html.Td([
-                    html.H6('SOLUTION:'),
-                    html.Li(html.P(f"Path: {', '.join([c.name for c in solution.path])}")),
-                    html.Li(html.P(f'Time left: {solution.time_left}')),
-                    html.Li(html.P(f'Earned / total: {solution.total}')),
-                    html.Li(html.P(f'Mean quantity: {float(np.mean([c.value for c in cities])):.2f}')),
-                ], style={'vertical-align': 'top'})
+        html.Div([
+            html.H6('SOLUTION:'),
+            html.Li(html.P(f'Solving time: {solve_time:.4f}')),
+            html.Li(html.P(f"Path: {', '.join([c.name for c in solution.path])}")),
+            html.Li(html.P(f'Time left: {solution.time_left}')),
+            html.Li(html.P(f'Earned / total: {solution.total}')),
+            html.Li(html.P(f'Mean quantity: {float(np.mean([c.value for c in cities])):.2f}')),
+            html.A('Download', href="/tmp/solution", target='blank')
             ])
-        ], style={'border': 'none'}),
-        button('save-btn', 'save', align='left'),
     ]
 
 

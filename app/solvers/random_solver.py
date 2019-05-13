@@ -1,35 +1,7 @@
-import numpy as np
 import pandas as pd
 import random
-import time
-from typing import List, Tuple
 from collections import namedtuple
-
-
-class City:
-    """ This class defines how city is represented. """
-
-    def __init__(self, name: str, x: int, y: int, value: int = 0) -> None:
-        """ Initializes attributes. """
-        self.name = name
-        self.x = x
-        self.y = y
-        self.value = value
-        self.neighbours = {}
-        self.visited = False
-
-    def set_coords(self, df_cities: pd.DataFrame) -> None:
-        self.x = df_cities.loc[df_cities['name']]
-
-    def set_neighbours(self, d: dict = dict()) -> None:
-        self.neighbours = d.get(self.name, {})   # get the dictionary of pairs {neighbour:travel_time}
-
-    def __str__(self) -> str:
-        """ Defines how print(object_name) is displayed. """
-        return f"City: {self.name}\n" + \
-               f"Coord: ({self.x}, {self.y})\n" + \
-               f"Value: {self.value}\n" + \
-               f"Ngbrs: {self.neighbours}\n"
+from .city import City
 
 
 Output = namedtuple('Output', ['time_left', 'total', 'path'])
@@ -154,15 +126,3 @@ def solve(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame):
     solution = find_best_of_random_paths(cities_dict, working_time, 50)
 
     return solution, convert_to_edges_list(solution.path)
-
-
-def make_plot_data(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
-    solution, selected_edges = solve(cities, paths, time)
-
-    check = lambda fc, tc: ((fc, tc) in selected_edges) or ((tc, fc) in selected_edges)
-
-    cities = [City(name, x, y, q) for name, x, y, q in cities.values]
-    edges = ((from_c, to_c, {'time': t, 'solution': check(from_c, to_c)})
-             for from_c, to_c, t in paths.values)
-
-    return solution, cities, edges

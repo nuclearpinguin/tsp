@@ -8,7 +8,7 @@ import pandas as pd
 from functools import reduce
 from time import time as now
 
-from .solver import City
+from app.solvers import City
 
 
 def prepare_data(cities: List[City]):
@@ -19,14 +19,6 @@ def prepare_data(cities: List[City]):
 def parse_contents(contents: str) -> pd.DataFrame:
     """
     Helper for parsing uploaded .csv file
-
-    Parameters
-    ----------
-    contents
-
-    Returns
-    -------
-
     """
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)

@@ -1,8 +1,6 @@
 import time
-import pandas as pd
 
-from app.solver import tsp
-from mind.generator import generate_csv, validate_input
+from generator import generate_csv, validate_input
 
 
 def check_time(size: int):

@@ -1,4 +1,4 @@
-from mind.app.app_factory import create_app
+from app.app_factory import create_app
 from dash import Dash
 
 
