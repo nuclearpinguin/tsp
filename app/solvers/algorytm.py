@@ -1,5 +1,6 @@
-import .Cities as cities
-
+import sys, getopt
+import os
+import pandas as pd
 
 class City:
     """ This class defines how city is represented. """
