@@ -1,6 +1,4 @@
-import sys, getopt
-import os
-import pandas as pd
+import .Cities as cities
 
 
 class City:
