@@ -120,8 +120,8 @@ def validate_input(cities: pd.DataFrame, paths: pd.DataFrame) -> tuple:
             return False, f"Whoops! No coordinates for city {city_to} :<"
 
         # Unpack info about city_from cf, city_to ct
-        fx, fy, _, fq = cf.values[0]
-        tx, ty, _, tq = ct.values[0]
+        _, fx, fy, fq = cf.values[0]
+        _, tx, ty, tq = ct.values[0]
 
         if not isinstance(fx, int):
             return False, f"Coordinate x of city {city_from} is not integer."

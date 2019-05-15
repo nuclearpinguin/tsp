@@ -7,11 +7,15 @@ import numpy as np
 from app.helpers import make_graph
 
 
+def error(msg: str):
+    return html.P(msg.capitalize(), style={'color': 'red'})
+
+
 def button(idx: str, txt: str, align: str = 'right'):
     return html.Button(txt,
                        id=idx,
                        style={
-                           'margin-top': '20px',
+                           'margin-top': '40px',
                            'float': align,
                            'background-color': '#1EAEDB',
                            'color': 'white'},
@@ -79,24 +83,6 @@ def upload_table(name: str, df: pd.DataFrame):
             style_table={'maxHeight': '300px'},
         ),
     ])
-
-
-def description():
-    return dcc.Markdown('''
-### About the Traveling Salesman Problem
-
-Given a list of cities and the distances between each pair of cities, 
-what is the shortest possible route that visits each city and returns to the origin city? 
-([Wiki](http://commonmark.org/help))
-
-This app allows you to solve the problem. But first you have to upload three files:
-
-- Matrix of connections between cities
-
-- Cities coordinates
-
-- Additional information about each city
-        ''')
 
 
 def vbar():

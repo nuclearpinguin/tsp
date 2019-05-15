@@ -42,10 +42,6 @@ def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> 
     while tmp_time > 0:
         time_left = tmp_time
 
-        #TODO
-        # change this to:
-        # for city in cities:
-        #   c_copy = cities_list.copy()
         if curr_city not in path:
             # city value is added only once
             total += curr_city.value
@@ -65,7 +61,7 @@ def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> 
     return Output(time_left, total, path)
 
 
-def find_best_of_random_paths(cities_dict: dict, working_time: int, n=50) -> Output:
+def find_best_of_random_paths(cities_dict: dict, working_time: int, n: int) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
     :param d: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
@@ -98,7 +94,7 @@ def convert_to_edges_list(paths: list):
 
 
 # solver
-def solve(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame):
+def solve(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame, n_simulation: int = 50):
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
     assert isinstance(info, pd.DataFrame), 'Wrong data format!'
@@ -119,10 +115,7 @@ def solve(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame):
     # get working time from the data frame
     working_time = info['time'].values[0]
 
-    #TODO
-    # data validation
-
     # compute the best path
-    solution = find_best_of_random_paths(cities_dict, working_time, 50)
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation)
 
     return solution, convert_to_edges_list(solution.path)

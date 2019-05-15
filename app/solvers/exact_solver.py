@@ -1,40 +1,4 @@
-import sys, getopt
-import os
-import pandas as pd
-
-
-class City:
-    """ This class defines how city is represented. """
-
-    def __init__(self, name = "", x = None, y = None, value = 0, neighbours = {}):
-        """ Initializes attributes. """
-        self.name = name
-        self.x = x
-        self.y = y
-        self.value = value
-        self.neighbours = neighbours
-        self.visited = False
-
-    def getCoords(self, df_cities):
-        self.x = df_cities.loc[df_cities['name']]
-
-    def getNeighbours(self, d ={}):
-        self.neighbours = d.get(self.name, {})   # get the dictionary of pairs {neighbour:travel_time}
-
-    def __str__(self):
-        """ Defines how print(object_name) is displayed. """
-        return "City: " + str(self.name) + "\n" + \
-               "Coord: (" + str(self.x) + ', ' +  str(self.y) + ")\n" + \
-               "Value: " + str(self.value) + "\n" + \
-               "Ngbrs: " + str(self.neighbours) + "\n"
-
-# przykładowy graf
-graph = {'A': ['B','C'],
-         'B': ['A','C','D'],
-         'C': ['A','B','D','F'],
-         'D': ['B','C'],
-         'E': ['F'],
-         'F': ['E','C']}
+from .city import City
 
 
 def convert_to_dict(df_cities, df_paths):
@@ -60,7 +24,7 @@ def convert_to_dict(df_cities, df_paths):
 
 def find_all_paths(graph, start, time, path=[]):
     path = path + [start]
-    if time==0 :
+    if time == 0:
         return [path]
     if start not in graph:
         return []
@@ -74,7 +38,7 @@ def find_all_paths(graph, start, time, path=[]):
         newpaths = find_all_paths(graph, node, time, path)
         for newpath in newpaths:
             paths.append(newpath)
-        if time==0:
+        if time == 0:
             break
     return paths
 
@@ -86,13 +50,12 @@ def find_all_possible_paths(graph, start, time, path=[], price=0):
     path = path + [start]
     if start not in graph:
         return []
-    paths = []
     for node in graph[start].keys():
         if time - graph[start][node] >=0:
             newpaths = find_all_possible_paths(graph, node, time , path, graph[start][node])
         else:
             all_paths.append(path)
-        if time==0:
+        if time == 0:
             break
     return all_paths
 
@@ -120,7 +83,7 @@ def create_cities_dictionary(graph):
         vec = cities.loc[cities['name'] == k].values[0]
         # vec[1] = x, vec[2] = y, vec[3] = quantity
         c = City(k, vec[1], vec[2], vec[3])
-        c.getNeighbours(d)
+        c.set_neighbours(d)
         cities_dict[k] = c
     return cities_dict
 

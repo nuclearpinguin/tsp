@@ -16,7 +16,7 @@ def prepare_data(cities: List[City]):
             for city in cities]
 
 
-def parse_contents(contents: str) -> pd.DataFrame:
+def parse_contents(contents: str, columns = None) -> pd.DataFrame:
     """
     Helper for parsing uploaded .csv file
     """
@@ -125,5 +125,6 @@ def make_graph(nodes: List[City], edges: List[Tuple[str, str]]):
                              xref="paper", yref="paper",
                              x=0.005, y=-0.002)],
                          xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, scaleanchor="x", scaleratio=1),
+                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False,
+                                    scaleanchor="x", scaleratio=1),
                      ))

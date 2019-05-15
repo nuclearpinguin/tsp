@@ -1,7 +1,8 @@
 import pandas as pd
-from collections import namedtuple
+import numpy as np
+from collections import namedtuple, Counter
 
-from app.solvers.solver import Output
+from app.solvers import Output
 
 Result = namedtuple('Result', ['status', 'msg'])
 
@@ -16,12 +17,88 @@ def validate_cities(df: pd.DataFrame) -> Result:
     if list(df.columns) != ['name', 'x', 'y', 'quantity']:
         return Result(False, 'Wrong columns names!')
 
+    if df.shape[0] != df.name.unique().size:
+        return Result(False, f"Whoops! It seems that some cities are duplicated!")
+
+    for name, x, y, q in df.values:
+        try:
+            int(str(q))
+        except ValueError:
+            return Result(False, f"Whoops! Commodity amount in city {name} is not integer! :<")
+
+        if q < 0:
+            return Result(False, f"Whoops! Commodity amount in city {name} is below zero! :<")
+
+        try:
+            int(str(x))
+        except ValueError:
+            return Result(False, f"Whoops! Coordinate x in city {name} is not integer! :<")
+
+        try:
+            int(str(y))
+        except ValueError:
+            return Result(False, f"Whoops! Coordinate y in city {name} is not integer! :<")
+
     return Result(True, 'Success')
 
 
-def validate_paths(df: pd.DataFrame) -> Result:
+def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
     if list(df.columns) != ['city_from', 'city_to', 'time']:
         return Result(False, 'Wrong columns names!')
+
+    # Each city can have at most 4 neighbours
+    cntr = Counter(np.concatenate([df.city_from.values, df.city_to.values]))
+    check = sum(x for x in cntr.values() if x > 4)
+    if check > 0:
+        return Result(False, f"Whoops! At least one city has more than 4 neighbours! :o")
+
+    # General check for paths and cities
+    unique_cities = cities.name.unique().tolist()
+    unique_cities.sort()
+
+    unique_paths = df.city_from.unique().tolist() + df.city_to.unique().tolist()
+    unique_paths = list(set(unique_paths))
+    unique_paths.sort()
+
+    ucl = len(unique_cities)
+    upl = len(unique_paths)
+    if ucl > upl:
+        return Result(False, f'It seems that there are {ucl- upl} \
+        cities that are lonely islands. Take care of them!')
+
+    if ucl < upl:
+        return Result(False, f'It seems that there are {upl-ucl} cities that \
+        are unplottable. Check if each city in paths is provided with coordinates')
+
+    if unique_cities != unique_paths:
+        return Result(False, 'Something elements differs')
+
+    for city_from, city_to, dist in df.values:
+        try:
+            int(str(dist))
+        except ValueError:
+            return Result(False, f"Whoops! Distance between {city_from}-{city_to} is not integer! :<")
+
+        if dist < 0:
+            return Result(False, f"Distance between {city_from}-{city_to} is less than 0. \
+             We do not support time travellers yet :<")
+
+        # Validate relation between cities and paths
+        cf = cities[cities.name == city_from]
+        if cf.shape[0] != 1:
+            return Result(False, f"Whoops! No coordinates for city {city_from} :<")
+
+        ct = cities[cities.name == city_to]
+        if ct.shape[0] != 1:
+            return Result(False, f"Whoops! No coordinates for city {city_to} :<")
+
+        # Unpack info about city_from cf, city_to ct
+        _, fx, fy, fq = cf.values[0]
+        _, tx, ty, tq = ct.values[0]
+
+        if abs(fx - tx) + abs(fy-ty) != 1:
+            return Result(False, f"Cities {city_from}-{city_to} are off \
+            the grid with coords ({fx},{fy}) and ({tx},{ty}).")
 
     return Result(True, 'Success')
 
@@ -34,7 +111,7 @@ def validate_time(df: pd.DataFrame) -> Result:
         return Result(False, 'Wrong format!')
 
     try:
-        t = int(df.time.values[0])
+        int(str(df.time.values[0]))
     except ValueError:
         return Result(False, 'Time is not an integer!')
 

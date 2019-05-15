@@ -1,11 +1,11 @@
 import pandas as pd
 
 from .city import City
-from .random_solver import solve
+from .random_solver import solve, Output
 
 
-def make_plot_data(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
-    solution, selected_edges = solve(cities, paths, time)
+def make_plot_data(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, simulations: int = 50):
+    solution, selected_edges = solve(cities, paths, time, simulations)
 
     check = lambda fc, tc: ((fc, tc) in selected_edges) or ((tc, fc) in selected_edges)
 
