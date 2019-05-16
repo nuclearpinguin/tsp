@@ -2,7 +2,6 @@ import sys, getopt
 import os
 import pandas as pd
 
-
 class City:
     """ This class defines how city is represented. """
 
@@ -28,14 +27,6 @@ class City:
                "Value: " + str(self.value) + "\n" + \
                "Ngbrs: " + str(self.neighbours) + "\n"
 
-# przykładowy graf
-graph = {'A': ['B','C'],
-         'B': ['A','C','D'],
-         'C': ['A','B','D','F'],
-         'D': ['B','C'],
-         'E': ['F'],
-         'F': ['E','C']}
-
 
 def convert_to_dict(df_cities, df_paths):
     """
@@ -56,27 +47,6 @@ def convert_to_dict(df_cities, df_paths):
         # then merge them
         dict_paths[city] = {key: value for key, value in zip(neighbours_keys, neighbours_values)}
     return dict_paths
-
-
-def find_all_paths(graph, start, time, path=[]):
-    path = path + [start]
-    if time==0 :
-        return [path]
-    if start not in graph:
-        return []
-    paths = []
-    for node in graph[start]:
-        time = time - 1
-        print(path)
-        print(graph[start])
-        print(node)
-        print(time)
-        newpaths = find_all_paths(graph, node, time, path)
-        for newpath in newpaths:
-            paths.append(newpath)
-        if time==0:
-            break
-    return paths
 
 
 def find_all_possible_paths(graph, start, time, path=[], price=0):
@@ -115,12 +85,12 @@ def create_all_possible_paths(graph,time):
     return lista
 
 
-def create_cities_dictionary(graph):
+def create_cities_dictionary(graph, cities):
     for k in graph.keys():
         vec = cities.loc[cities['name'] == k].values[0]
         # vec[1] = x, vec[2] = y, vec[3] = quantity
         c = City(k, vec[1], vec[2], vec[3])
-        c.getNeighbours(d)
+        c.getNeighbours(graph)
         cities_dict[k] = c
     return cities_dict
 
@@ -139,7 +109,6 @@ def choose_the_best_path(lista, cities_list):
         g = g + 1
         for krok in j:
             cities_list[krok].visited = False
-        # print(i)
         i = i + 1
     return podsumowanie
 
