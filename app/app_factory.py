@@ -23,7 +23,7 @@ def create_app():
     """
     Dash app factory and layout definition
     """
-    app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+    app = dash.Dash(__name__, external_stylesheets=external_stylesheets, sharing=True)
     app.config['suppress_callback_exceptions'] = True
 
     app.layout = html.Div([
