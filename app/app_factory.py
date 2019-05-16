@@ -2,6 +2,7 @@
 import time
 import dash
 import flask
+import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
@@ -14,6 +15,8 @@ from app.solvers import make_plot_data
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+CLICKS = 0
 
 
 def create_app():
@@ -47,9 +50,27 @@ def create_app():
                         style={'width': '33%', 'vertical-align': 'top'}),
                 ]),
             ], style={'width': '100%', 'height': '100px'}),
-            html.Label('Max time:'),
-            dcc.Slider(min=5, max=65, value=15, id='simulation-slider',
+            daq.BooleanSwitch(
+                id='exact-solver',
+                on=False,
+                label='Use exact solver',
+                labelPosition='top',
+                style={'margin-right': '20px', 'display': 'inline-block'}
+            ),
+            daq.BooleanSwitch(
+                id='plot-switch',
+                on=True,
+                label='Plot solution',
+                labelPosition='top',
+                style={'margin-right': '20px', 'display': 'inline-block'}
+            ),
+            html.Div(id='time-slider-output', style={'margin-top': '10px'}),
+            dcc.Slider(min=5, max=65, value=15, id='time-slider',
                        marks={(5 * (i+1)): f'{5 * (i+1)}s' if i != 12 else 'Inf' for i in range(13)}),
+
+            html.Div(id='simulations-slider-output', style={'margin-top': '40px'}),
+            dcc.Slider(min=10, max=490, value=90, id='simulations-slider',
+                       marks={(10 * i * i): f'{10 * i * i}' for i in range(1, 10)}),
             comp.button('solve-btn', 'solve'),
         ]),
 
@@ -113,16 +134,21 @@ def create_app():
                   [Input('solve-btn', 'n_clicks'),
                    Input('city-matrix-input', 'contents'),
                    Input('coordinates-input', 'contents'),
-                   Input('info-input', 'contents')],
+                   Input('info-input', 'contents'),
+                   Input('simulations-slider', 'value'),
+                   ],
                   [State('memory', 'data')])
-    def generate_solution(n_clicks, city, coords, df_time, cache):
-        if n_clicks and city and coords and df_time and n_clicks > 0:
+    def generate_solution(n_clicks, city, coords, df_time, n_sim, cache):
+        global CLICKS
+        if n_clicks and city and coords and df_time and n_clicks > CLICKS:
+            CLICKS += 1
 
             tic = time.time()
             df_time = parse_contents(df_time)
             solution, cities, edges = make_plot_data(cities=parse_contents(city),
                                                      paths=parse_contents(coords),
-                                                     time=df_time)
+                                                     time=df_time,
+                                                     simulations=n_sim)
             solving_time = time.time() - tic
 
             # Save solution
@@ -137,16 +163,16 @@ def create_app():
 
             return output, cache
 
-        if n_clicks is not None and n_clicks > 0:
+        if n_clicks is not None and n_clicks > CLICKS:
             return [comp.error('no data')], dict()
 
         return None, dict()
 
     @app.callback([Output('tsp-graph', 'children')],
-                  [Input('memory', 'data')],
+                  [Input('memory', 'data'), Input('plot-switch', 'on')],
                   [State('memory', 'data')])
-    def show_plot(_, cache):
-        if cache:
+    def show_plot(_, plot, cache):
+        if cache and plot:
             cities, edges = cache.values()
 
             output = list([html.H3(children='Plot'), comp.vbar()])
@@ -160,5 +186,15 @@ def create_app():
                                mimetype='text',
                                attachment_filename='solution.txt',
                                as_attachment=True)
+
+    @app.callback([Output('time-slider-output', 'children')],
+                  [Input('time-slider', 'value')])
+    def update_time(n):
+        return [f'Max time {n} s']
+
+    @app.callback([Output('simulations-slider-output', 'children')],
+                  [Input('simulations-slider', 'value')])
+    def update_simulations(n):
+        return [f'Random walks per node {n}']
 
     return app

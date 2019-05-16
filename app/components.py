@@ -8,7 +8,7 @@ from app.helpers import make_graph
 
 
 def error(msg: str):
-    return html.P(msg.capitalize(), style={'color': 'red'})
+    return html.P(msg, style={'color': 'red'})
 
 
 def button(idx: str, txt: str, align: str = 'right'):
@@ -73,6 +73,7 @@ def stats(solve_time: float, solution, cities):
 
 
 def upload_table(name: str, df: pd.DataFrame):
+    df = df.iloc[:20, :]
     return html.Div([
         html.P(f'File {name} successfully uploaded!'),
         dash_table.DataTable(
