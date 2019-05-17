@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output, State
 import app.components as comp
 import app.file_handlers as fh
 from app.helpers import parse_contents, prepare_data
-from app.solvers import make_plot_data
+from app.solvers import make_plot_data, data_from_solution
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -24,29 +24,34 @@ def create_app():
     Dash app factory and layout definition
     """
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets, sharing=True)
-    app.config['suppress_callback_exceptions'] = True
+    # app.config['suppress_callback_exceptions'] = True
 
     app.layout = html.Div([
         dcc.Store(id='memory'),
         dcc.Store(id='params'),
         html.Div(children=[
-            html.H3('Files upload', style={'margin-top': '40px'}),
+            html.H3(id='problem-type', style={'margin-top': '40px', 'display': 'inline-block'}),
+            daq.BooleanSwitch(
+                id='type-switch',
+                on=False,
+                style={'margin-left': '20px', 'display': 'inline-block'}
+            ),
             comp.vbar(),
             html.Table(children=[
-                html.Tr(children=[
+                html.Tr(id='upload-row', children=[
                     html.Td(children=[
-                        comp.upload(idx='city-matrix-input', name='First upload city-matrix...'),
-                        html.Div(id='output-city-matrix')],
+                        comp.upload(idx='city-input', name='First upload city-matrix...'),
+                        html.Div(id='output-city')],
                         style={'width': '33%', 'vertical-align': 'top'}),
 
                     html.Td(children=[
-                        comp.upload(idx='coordinates-input', name='...now we need coordinates...'),
-                        html.Div(id='output-coordinates')],
+                        comp.upload(idx='paths-input', name='...now we need coordinates...'),
+                        html.Div(id='paths-output')],
                         style={'width': '33%', 'vertical-align': 'top'}),
 
                     html.Td(children=[
-                        comp.upload(idx='info-input', name='...finally add some info'),
-                        html.Div(id='output-info')],
+                        comp.upload(idx='time-solution--input', name='...finally add some info'),
+                        html.Div(id='time-output')],
                         style={'width': '33%', 'vertical-align': 'top'}),
                 ]),
             ], style={'width': '100%', 'height': '100px'}),
@@ -75,17 +80,17 @@ def create_app():
         ]),
 
         html.Div(children=[
-            dcc.Loading([html.Div(id='tsp-solution', children=[])], color='#1EAEDB'),
-            dcc.Loading([html.Div(id='tsp-graph', children=[])], color='#1EAEDB')
+            dcc.Loading([html.Div(id='tsp-solution')], color='#1EAEDB'),
+            dcc.Loading([html.Div(id='tsp-graph')], color='#1EAEDB')
         ], style={'margin-top': '40px'})
 
     ], style={'width': '85%', 'margin-left': '7.5%'})
 
-    @app.callback([Output('output-city-matrix', 'children')],
-                  [Input('city-matrix-input', 'contents')],
-                  [State('city-matrix-input', 'filename')])
+    @app.callback([Output('output-city', 'children')],
+                  [Input('city-input', 'contents')],
+                  [State('city-input', 'filename')])
     def upload_city_matrix(content, name):
-        if content is not None:
+        if content:
             if '.csv' not in name:
                 return html.Div(comp.error('Only .csv files ar supported!')),
 
@@ -97,11 +102,11 @@ def create_app():
             return comp.upload_table(name, df),
         return None,
 
-    @app.callback([Output('output-coordinates', 'children')],
-                  [Input('coordinates-input', 'contents'), Input('city-matrix-input', 'contents')],
-                  [State('coordinates-input', 'filename')])
-    def upload_coordinates(content, cities, name):
-        if content is not None:
+    @app.callback([Output('paths-output', 'children')],
+                  [Input('paths-input', 'contents'), Input('city-input', 'contents')],
+                  [State('paths-input', 'filename')])
+    def upload_paths(content, cities, name):
+        if content:
             if '.csv' not in name:
                 return html.Div(comp.error('Only .csv files ar supported!')),
 
@@ -114,11 +119,20 @@ def create_app():
             return comp.upload_table(name, df),
         return None,
 
-    @app.callback([Output('output-info', 'children')],
-                  [Input('info-input', 'contents')],
-                  [State('info-input', 'filename')])
-    def upload_info(content, name):
-        if content is not None:
+    @app.callback([Output('time-output', 'children')],
+                  [Input('type-switch', 'on'), Input('time-solution--input', 'contents')],
+                  [State('time-solution--input', 'filename')])
+    def upload_time_solution(old_solution, content, name):
+        if old_solution and content:
+            if '.txt' not in name:
+                return html.Div(comp.error('Only .txt files ar supported!')),
+
+            result = fh.validate_solution(content)
+            if not result.status:
+                return comp.error(result.msg),
+            return html.Div([html.P(f'File {name} successfully uploaded!')]),
+
+        if content:
             if '.csv' not in name:
                 return html.Div(comp.error('Only .csv files ar supported!')),
 
@@ -131,22 +145,51 @@ def create_app():
         return None,
 
     @app.callback([Output('tsp-solution', 'children'), Output('memory', 'data')],
-                  [Input('solve-btn', 'n_clicks'),
-                   Input('city-matrix-input', 'contents'),
-                   Input('coordinates-input', 'contents'),
-                   Input('info-input', 'contents'),
+                  [Input('type-switch', 'on'),
+                   Input('solve-btn', 'n_clicks'),
+                   Input('city-input', 'contents'),
+                   Input('paths-input', 'contents'),
+                   Input('time-solution--input', 'contents'),
                    Input('simulations-slider', 'value'),
                    ],
                   [State('memory', 'data')])
-    def generate_solution(n_clicks, city, coords, df_time, n_sim, cache):
+    def generate_solution(old_solution, n_clicks, city, paths, df_time, n_sim, cache):
         global CLICKS
-        if n_clicks and city and coords and df_time and n_clicks > CLICKS:
+        if old_solution and n_clicks and n_clicks > CLICKS:
+            solution_content = df_time
+            if solution_content:
+                CLICKS += 1
+                solution = fh.solution_to_output(solution_content)
+
+                if city and paths:
+                    cities, edges = data_from_solution(cities=parse_contents(city),
+                                                       paths=parse_contents(paths),
+                                                       solution=solution)
+                else:
+                    cities, edges = data_from_solution(cities=None,
+                                                       paths=None,
+                                                       solution=solution)
+
+                # Save solution
+                fh.save_solution(solution, solution.time_left, new=False)
+
+                # Generate html elements
+                output = [html.H3(children='Solution'), comp.vbar()]
+                output += comp.stats(0.0, solution, cities)
+
+                # Cache data
+                cache = {'cities': prepare_data(cities), 'edges': list(edges)}
+
+                return output, cache
+
+        # New solution
+        elif n_clicks and city and paths and df_time and n_clicks > CLICKS:
             CLICKS += 1
 
             tic = time.time()
             df_time = parse_contents(df_time)
             solution, cities, edges = make_plot_data(cities=parse_contents(city),
-                                                     paths=parse_contents(coords),
+                                                     paths=parse_contents(paths),
                                                      time=df_time,
                                                      simulations=n_sim)
             solving_time = time.time() - tic
@@ -163,10 +206,7 @@ def create_app():
 
             return output, cache
 
-        if n_clicks is not None and n_clicks > CLICKS:
-            return [comp.error('no data')], dict()
-
-        return None, dict()
+        return [], None
 
     @app.callback([Output('tsp-graph', 'children')],
                   [Input('memory', 'data'), Input('plot-switch', 'on')],
@@ -196,5 +236,48 @@ def create_app():
                   [Input('simulations-slider', 'value')])
     def update_simulations(n):
         return [f'Random walks per node {n}']
+
+    @app.callback([Output('problem-type', 'children'), Output('upload-row', 'children')],
+                  [Input('type-switch', 'on')])
+    def update_view(old_solution):
+        if old_solution:
+            title = ['Old problem']
+            row = [
+            html.Td(children=[
+                comp.upload(idx='time-solution--input', name='Upload solution'),
+                html.Div(id='time-output')],
+                style={'width': '33%', 'vertical-align': 'top'}),
+
+                html.Td(children=[
+                    comp.upload(idx='city-input', name='Optional city matrix'),
+                    html.Div(id='output-city')],
+                    style={'width': '33%', 'vertical-align': 'top'}),
+
+                html.Td(children=[
+                    comp.upload(idx='paths-input', name='Upload paths'),
+                    html.Div(id='paths-output')],
+                    style={'width': '33%', 'vertical-align': 'top'}),
+                ]
+            return title, row
+
+        title = ['New problem']
+        row = [
+            html.Td(children=[
+                comp.upload(idx='city-input', name='First upload city-matrix...'),
+                html.Div(id='output-city')],
+                style={'width': '33%', 'vertical-align': 'top'}),
+
+            html.Td(children=[
+                comp.upload(idx='paths-input', name='...now we need coordinates...'),
+                html.Div(id='paths-output')],
+                style={'width': '33%', 'vertical-align': 'top'}),
+
+            html.Td(children=[
+                comp.upload(idx='time-solution--input', name='...finally add some info'),
+                html.Div(id='time-output')],
+                style={'width': '33%', 'vertical-align': 'top'}),
+        ]
+
+        return title, row
 
     return app
