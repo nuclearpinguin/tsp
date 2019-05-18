@@ -1,6 +1,32 @@
 from .city import City
 
 
+class City:
+    """ This class defines how city is represented. """
+
+    def __init__(self, name = "", x = None, y = None, value = 0, neighbours = {}):
+        """ Initializes attributes. """
+        self.name = name
+        self.x = x
+        self.y = y
+        self.value = value
+        self.neighbours = neighbours
+        self.visited = False
+
+    def getCoords(self, df_cities):
+        self.x = df_cities.loc[df_cities['name']]
+
+    def getNeighbours(self, d ={}):
+        self.neighbours = d.get(self.name, {})   # get the dictionary of pairs {neighbour:travel_time}
+
+    def __str__(self):
+        """ Defines how print(object_name) is displayed. """
+        return "City: " + str(self.name) + "\n" + \
+               "Coord: (" + str(self.x) + ', ' +  str(self.y) + ")\n" + \
+               "Value: " + str(self.value) + "\n" + \
+               "Ngbrs: " + str(self.neighbours) + "\n"
+
+
 def convert_to_dict(df_cities, df_paths):
     """
     Converts data frames of cities and paths to a dictionary {city: {neighbour : time_to_neighbour}}.
@@ -22,27 +48,6 @@ def convert_to_dict(df_cities, df_paths):
     return dict_paths
 
 
-def find_all_paths(graph, start, time, path=[]):
-    path = path + [start]
-    if time == 0:
-        return [path]
-    if start not in graph:
-        return []
-    paths = []
-    for node in graph[start]:
-        time = time - 1
-        print(path)
-        print(graph[start])
-        print(node)
-        print(time)
-        newpaths = find_all_paths(graph, node, time, path)
-        for newpath in newpaths:
-            paths.append(newpath)
-        if time == 0:
-            break
-    return paths
-
-
 def find_all_possible_paths(graph, start, time, path=[], price=0):
     global all_paths
     global newpaths
@@ -50,12 +55,13 @@ def find_all_possible_paths(graph, start, time, path=[], price=0):
     path = path + [start]
     if start not in graph:
         return []
+    paths = []
     for node in graph[start].keys():
         if time - graph[start][node] >=0:
             newpaths = find_all_possible_paths(graph, node, time , path, graph[start][node])
         else:
             all_paths.append(path)
-        if time == 0:
+        if time==0:
             break
     return all_paths
 
@@ -78,12 +84,12 @@ def create_all_possible_paths(graph,time):
     return lista
 
 
-def create_cities_dictionary(graph):
+def create_cities_dictionary(graph, cities):
     for k in graph.keys():
         vec = cities.loc[cities['name'] == k].values[0]
         # vec[1] = x, vec[2] = y, vec[3] = quantity
         c = City(k, vec[1], vec[2], vec[3])
-        c.set_neighbours(d)
+        c.getNeighbours(graph)
         cities_dict[k] = c
     return cities_dict
 
@@ -102,7 +108,6 @@ def choose_the_best_path(lista, cities_list):
         g = g + 1
         for krok in j:
             cities_list[krok].visited = False
-        # print(i)
         i = i + 1
     return podsumowanie
 
@@ -128,3 +133,34 @@ def create_answer_for_path_creation(dict, best):
     for x in range(do):
         answer_plot.append((dict[best][x], dict[best][x + 1]))
     return answer_plot
+
+
+def solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
+    assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(info, pd.DataFrame), 'Wrong data format!'
+
+    all_paths = []
+    newpaths = []
+
+    # build a dictionary {city : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    d = convert_to_dict(cities, paths)
+
+    lista = create_all_possible_paths(d, time)
+
+    # build a dict {city_name : City object}
+    cities_dict = {}
+    cities_dict = create_cities_dictionary(d)
+
+    cities_dict_with_values = {}
+    cities_dict_with_values = choose_the_best_path(lista, cities_dict)
+
+    naj = return_the_best_value(cities_dict_with_values)
+
+    koszt = return_cost_of_the_best_path(cities_dict_with_values, naj)
+
+    tomeczek = create_answer_for_path_creation(cities_dict_with_values, naj)
+
+    solution = [time - koszt, naj, cities_dict_with_values[naj]]
+    
+return solution, tomeczek
