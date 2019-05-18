@@ -2,6 +2,7 @@ import pandas as pd
 import random
 from collections import namedtuple
 from .city import City
+from time import time
 
 
 Output = namedtuple('Output', ['time_left', 'total', 'path'])
@@ -69,6 +70,8 @@ def find_best_of_random_paths(cities_dict: dict, working_time: int, n: int) -> O
     :param n: number of trials for each vertex in random walk
     """
 
+    start_time = time()
+
     best_paths = []
     for starting_city in cities_dict.keys():
         lst = []
@@ -81,6 +84,11 @@ def find_best_of_random_paths(cities_dict: dict, working_time: int, n: int) -> O
         # sort list [time_left, total, path] by total, descending
         lst.sort(key=lambda x: x[1], reverse=True)
         best_paths.append(lst[0])
+
+        # if finding the best path took 50s as far,
+        # break the loop and select the best of paths found as far
+        if time() - start_time > 50:
+            break
 
     best_paths.sort(key=lambda x: x[1], reverse=True)
 
