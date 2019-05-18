@@ -74,8 +74,8 @@ def create_app():
                        marks={(5 * (i+1)): f'{5 * (i+1)}s' if i != 12 else 'Inf' for i in range(13)}),
 
             html.Div(id='simulations-slider-output', style={'margin-top': '40px'}),
-            dcc.Slider(min=10, max=490, value=90, id='simulations-slider',
-                       marks={(10 * i * i): f'{10 * i * i}' for i in range(1, 10)}),
+            dcc.Slider(min=10, max=500, value=50, id='simulations-slider',
+                       marks={(50 * i): f'{50 * i}' for i in range(0, 11)}),
             comp.button('solve-btn', 'solve'),
         ]),
 
@@ -241,7 +241,7 @@ def create_app():
                   [Input('type-switch', 'on')])
     def update_view(old_solution):
         if old_solution:
-            title = ['Old problem']
+            title = ['Upload solved problem']
             row = [
             html.Td(children=[
                 comp.upload(idx='time-solution--input', name='Upload solution'),
@@ -260,7 +260,7 @@ def create_app():
                 ]
             return title, row
 
-        title = ['New problem']
+        title = ['Solve']
         row = [
             html.Td(children=[
                 comp.upload(idx='city-input', name='First upload city-matrix...'),
