@@ -32,19 +32,19 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     return dict_paths
 
 
-def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> Output:
+def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> Output:
     """ Generates a list containing: time, total and random path. """
 
     path = []
     tmp_time = time_left
     total = 0
-    curr_city = cities_list[starting_city]
+    curr_city = cities_dict[starting_city]
 
     # reset visited property
-    for city in cities_list.values():
+    for city in cities_dict.values():
         city.visited = False
 
-    while tmp_time > 0:
+    while tmp_time >= 0:
         time_left = tmp_time
 
         if curr_city not in path:
@@ -59,13 +59,13 @@ def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> 
         next_city = random.choice(list(curr_city.neighbours.keys()))
 
         # if the city was visited - draw again
-        if cities_list[next_city].visited == True:
+        if cities_dict[next_city].visited:
             next_city = random.choice(list(curr_city.neighbours.keys()))
             # and maybe again
-            if cities_list[next_city].visited == True:
+            if cities_dict[next_city].visited:
                 next_city = random.choice(list(curr_city.neighbours.keys()))
                 # three times lucky
-                if cities_list[next_city].visited == True:
+                if cities_dict[next_city].visited:
                     next_city = random.choice(list(curr_city.neighbours.keys()))
 
         # subtract the travel time from available time
@@ -88,7 +88,7 @@ def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> 
                     break
 
         # set city we travelled to as a current city
-        curr_city = cities_list[next_city]
+        curr_city = cities_dict[next_city]
 
     return Output(time_left, total, path)
 
