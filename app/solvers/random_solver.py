@@ -24,8 +24,8 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
         neighbours_keys = list(df_paths[df_paths['city_from'] == city]['city_to']) + \
                           list(df_paths[df_paths['city_to'] == city]['city_from'])
         # get list of times needed to travel to each of them
-        neighbours_values = list(df_paths[df_paths['city_from'] == city]['time']) + \
-                            list(df_paths[df_paths['city_to'] == city]['time'])
+        neighbours_values = list(df_paths[df_paths['city_from'] == city]['travel_time']) + \
+                            list(df_paths[df_paths['city_to'] == city]['travel_time'])
         # then merge them
         dict_paths[city] = {key: value for key, value in zip(neighbours_keys, neighbours_values)}
 
