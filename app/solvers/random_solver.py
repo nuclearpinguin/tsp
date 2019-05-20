@@ -2,6 +2,7 @@ import pandas as pd
 import random
 from collections import namedtuple
 from .city import City
+from time import time
 
 
 Output = namedtuple('Output', ['time_left', 'total', 'path'])
@@ -31,32 +32,63 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     return dict_paths
 
 
-def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> Output:
+def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> Output:
     """ Generates a list containing: time, total and random path. """
 
     path = []
     tmp_time = time_left
     total = 0
-    curr_city = cities_list[starting_city]
+    curr_city = cities_dict[starting_city]
 
-    while tmp_time > 0:
+    # reset visited property
+    for city in cities_dict.values():
+        city.visited = False
+
+    while tmp_time >= 0:
         time_left = tmp_time
 
         if curr_city not in path:
-            # city value is added only once
+            # city's quantity is added only once
             total += curr_city.value
 
         # add city to a path
         path.append(curr_city)
+        curr_city.visited = True
 
         # select random neighbour
         next_city = random.choice(list(curr_city.neighbours.keys()))
 
+        # if the city was visited - draw again
+        if cities_dict[next_city].visited:
+            next_city = random.choice(list(curr_city.neighbours.keys()))
+            # and maybe again
+            if cities_dict[next_city].visited:
+                next_city = random.choice(list(curr_city.neighbours.keys()))
+                # three times lucky
+                if cities_dict[next_city].visited:
+                    next_city = random.choice(list(curr_city.neighbours.keys()))
+
         # subtract the travel time from available time
         tmp_time -= curr_city.neighbours[next_city]
 
+        # if for the drawn neighbour path was too expensive,
+        # check other neighbours
+        if tmp_time < 0:
+            for ngbr in curr_city.neighbours.keys():
+                # restore last time that was > 0
+                tmp = tmp_time + curr_city.neighbours[next_city]
+
+                # calculate time left after travel to ngbr
+                tmp -= curr_city.neighbours[ngbr]
+                # if "affordable" neighbour was found
+                if tmp > 0:
+                    # print(f"Better neighbour from {curr_city.name} found: {ngbr} instead of {next_city}")
+                    tmp_time = tmp
+                    next_city = ngbr
+                    break
+
         # set city we travelled to as a current city
-        curr_city = cities_list[next_city]
+        curr_city = cities_dict[next_city]
 
     return Output(time_left, total, path)
 
@@ -64,10 +96,12 @@ def find_random_path(cities_list: dict, starting_city: City, time_left: int) -> 
 def find_best_of_random_paths(cities_dict: dict, working_time: int, n: int) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
-    :param d: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
-    :param working_time:
+    :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    :param working_time: limits the duration of single path
     :param n: number of trials for each vertex in random walk
     """
+
+    start_time = time()
 
     best_paths = []
     for starting_city in cities_dict.keys():
@@ -81,6 +115,12 @@ def find_best_of_random_paths(cities_dict: dict, working_time: int, n: int) -> O
         # sort list [time_left, total, path] by total, descending
         lst.sort(key=lambda x: x[1], reverse=True)
         best_paths.append(lst[0])
+
+        # if finding the best path took 50s as far,
+        # break the loop and select the best of paths found as far
+        if time() - start_time > 50:
+            print("Time limit exceeded.")
+            break
 
     best_paths.sort(key=lambda x: x[1], reverse=True)
 
