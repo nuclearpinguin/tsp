@@ -93,12 +93,16 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
     return Output(time_left, total, path)
 
 
-def find_best_of_random_paths(cities_dict: dict, working_time: int, n: int) -> Output:
+def find_best_of_random_paths(cities_dict: dict,
+                              working_time: int,
+                              n: int,
+                              time_limit: int) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
     :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
     :param working_time: limits the duration of single path
     :param n: number of trials for each vertex in random walk
+    :param time_limit: max number of seconds the algorithm can work
     """
 
     start_time = time()
@@ -118,7 +122,7 @@ def find_best_of_random_paths(cities_dict: dict, working_time: int, n: int) -> O
 
         # if finding the best path took 50s as far,
         # break the loop and select the best of paths found as far
-        if time() - start_time > 50:
+        if time() - start_time > time_limit:
             print("Time limit exceeded.")
             break
 
@@ -134,7 +138,11 @@ def convert_to_edges_list(paths: list):
 
 
 # solver
-def solve(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame, n_simulation: int = 50):
+def solve(cities: pd.DataFrame,
+          edges: pd.DataFrame,
+          info: pd.DataFrame,
+          n_simulation: int = 50,
+          time_limit: int = 20):
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
     assert isinstance(info, pd.DataFrame), 'Wrong data format!'
@@ -156,6 +164,6 @@ def solve(cities: pd.DataFrame, edges: pd.DataFrame, info: pd.DataFrame, n_simul
     working_time = info['time'].values[0]
 
     # compute the best path
-    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation)
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
 
     return solution, convert_to_edges_list(solution.path)

@@ -74,8 +74,8 @@ def create_app():
                        marks={(5 * (i+1)): f'{5 * (i+1)}s' if i != 12 else 'Inf' for i in range(13)}),
 
             html.Div(id='simulations-slider-output', style={'margin-top': '40px'}),
-            dcc.Slider(min=10, max=500, value=50, id='simulations-slider',
-                       marks={(50 * i): f'{50 * i}' for i in range(0, 11)}),
+            dcc.Slider(min=10, max=490, value=90, id='simulations-slider',
+                       marks={(10 * i * i): f'{10 * i * i}' for i in range(1, 10)}),
             comp.button('solve-btn', 'solve'),
         ]),
 
@@ -151,9 +151,10 @@ def create_app():
                    Input('paths-input', 'contents'),
                    Input('time-solution-input', 'contents'),
                    Input('simulations-slider', 'value'),
+                   Input('time-slider', 'value')
                    ],
                   [State('memory', 'data')])
-    def generate_solution(old_solution, n_clicks, city, paths, df_time, n_sim, cache):
+    def generate_solution(old_solution, n_clicks, city, paths, df_time, n_sim, time_limit, cache):
         global CLICKS
         if old_solution and n_clicks and n_clicks > CLICKS:
             solution_content = df_time
@@ -191,7 +192,8 @@ def create_app():
             solution, cities, edges = make_plot_data(cities=parse_contents(city),
                                                      paths=parse_contents(paths),
                                                      time=df_time,
-                                                     simulations=n_sim)
+                                                     simulations=n_sim,
+                                                     time_limit=time_limit)
             solving_time = time.time() - tic
 
             # Save solution
