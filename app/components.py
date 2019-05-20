@@ -7,11 +7,15 @@ import numpy as np
 from app.helpers import make_graph
 
 
+def error(msg: str):
+    return [html.P(msg, style={'color': 'red'})]
+
+
 def button(idx: str, txt: str, align: str = 'right'):
     return html.Button(txt,
                        id=idx,
                        style={
-                           'margin-top': '20px',
+                           'margin-top': '40px',
                            'float': align,
                            'background-color': '#1EAEDB',
                            'color': 'white'},
@@ -57,19 +61,22 @@ def upload(idx: str, name: str = 'Select Files'):
 def stats(solve_time: float, solution, cities):
     return [
         html.Div([
-            html.H6('SOLUTION:'),
             html.Li(html.P(f'Solving time: {solve_time:.4f}')),
             html.Li(html.P(f"Path: {', '.join([c.name for c in solution.path])}")),
             html.Li(html.P(f'Time left: {solution.time_left}')),
             html.Li(html.P(f'Earned / total: {solution.total}')),
             html.Li(html.P(f'Mean quantity: {float(np.mean([c.value for c in cities])):.2f}')),
-            html.A('Download', href="/tmp/solution", target='blank')
+            html.A('Download',
+                   href="/tmp/solution", target='blank',
+                   style={'font-size': '16pt', 'text-transform': 'uppercase'}
+                   )
             ])
     ]
 
 
 def upload_table(name: str, df: pd.DataFrame):
-    return html.Div([
+    df = df.iloc[:20, :]
+    return [html.Div([
         html.P(f'File {name} successfully uploaded!'),
         dash_table.DataTable(
             data=df.to_dict('rows'),
@@ -78,25 +85,7 @@ def upload_table(name: str, df: pd.DataFrame):
             n_fixed_rows=1,
             style_table={'maxHeight': '300px'},
         ),
-    ])
-
-
-def description():
-    return dcc.Markdown('''
-### About the Traveling Salesman Problem
-
-Given a list of cities and the distances between each pair of cities, 
-what is the shortest possible route that visits each city and returns to the origin city? 
-([Wiki](http://commonmark.org/help))
-
-This app allows you to solve the problem. But first you have to upload three files:
-
-- Matrix of connections between cities
-
-- Cities coordinates
-
-- Additional information about each city
-        ''')
+    ])]
 
 
 def vbar():

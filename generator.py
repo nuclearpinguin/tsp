@@ -5,7 +5,7 @@ from time import sleep
 
 def unique(xs: list):
     seen = set()  # < keep track of what we have seen as we go
-    unique_list = [x for x in xs if not ((x[0], x[1]) in seen or seen.add((x[0], x[1])))]
+    unique_list = [x for x in xs if not ((x[1], x[0]) in seen or (x[0], x[1]) in seen or seen.add((x[0], x[1])))]
     return unique_list
 
 
@@ -120,8 +120,8 @@ def validate_input(cities: pd.DataFrame, paths: pd.DataFrame) -> tuple:
             return False, f"Whoops! No coordinates for city {city_to} :<"
 
         # Unpack info about city_from cf, city_to ct
-        fx, fy, _, fq = cf.values[0]
-        tx, ty, _, tq = ct.values[0]
+        _, fx, fy, fq = cf.values[0]
+        _, tx, ty, tq = ct.values[0]
 
         if not isinstance(fx, int):
             return False, f"Coordinate x of city {city_from} is not integer."
