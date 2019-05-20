@@ -55,13 +55,13 @@ def create_app():
                         style={'width': '33%', 'vertical-align': 'top'}),
                 ]),
             ], style={'width': '100%', 'height': '100px'}),
-            daq.BooleanSwitch(
-                id='exact-solver',
-                on=False,
-                label='Use exact solver',
-                labelPosition='top',
-                style={'margin-right': '20px', 'display': 'inline-block'}
-            ),
+            # daq.BooleanSwitch(
+            #     id='exact-solver',
+            #     on=False,
+            #     label='Use exact solver',
+            #     labelPosition='top',
+            #     style={'margin-right': '20px', 'display': 'inline-block'}
+            # ),
             daq.BooleanSwitch(
                 id='plot-switch',
                 on=True,
