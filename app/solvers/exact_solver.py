@@ -28,14 +28,6 @@ class City:
                "Value: " + str(self.value) + "\n" + \
                "Ngbrs: " + str(self.neighbours) + "\n"
 
-# przykładowy graf
-graph = {'A': ['B','C'],
-         'B': ['A','C','D'],
-         'C': ['A','B','D','F'],
-         'D': ['B','C'],
-         'E': ['F'],
-         'F': ['E','C']}
-
 
 def convert_to_dict(df_cities, df_paths):
     """
@@ -58,45 +50,7 @@ def convert_to_dict(df_cities, df_paths):
     return dict_paths
 
 
-def find_all_paths(graph, start, time, path=[]):
-    path = path + [start]
-    if time==0 :
-        return [path]
-    if start not in graph:
-        return []
-    paths = []
-    for node in graph[start]:
-        time = time - 1
-        print(path)
-        print(graph[start])
-        print(node)
-        print(time)
-        newpaths = find_all_paths(graph, node, time, path)
-        for newpath in newpaths:
-            paths.append(newpath)
-        if time==0:
-            break
-    return paths
-
-
-def find_all_possible_paths(graph, start, time, path=[], price=0):
-    global all_paths
-    global newpaths
-    time = time - price
-    path = path + [start]
-    if start not in graph:
-        return []
-    paths = []
-    for node in graph[start].keys():
-        if time - graph[start][node] >=0:
-            newpaths = find_all_possible_paths(graph, node, time , path, graph[start][node])
-        else:
-            all_paths.append(path)
-        if time==0:
-            break
-    return all_paths
-
-
+# deletes duplicate from list of paths
 def duplicate(items):
     unique = []
     for item in items:
@@ -105,63 +59,106 @@ def duplicate(items):
     return unique
 
 
-def create_all_possible_paths(graph,time):
-    lista = []
-    for x in graph.keys():
-        all_paths=[]
-        newpaths=[]
-        lista = lista + duplicate(find_all_possible_paths(graph,x,time))
-        print(x)
-    return lista
-
-
-def create_cities_dictionary(graph):
+def create_cities_dictionary(graph, cities_temp):
+    cities_dict_temp ={}
     for k in graph.keys():
-        vec = cities.loc[cities['name'] == k].values[0]
+        vec = cities_temp.loc[cities['name'] == k].values[0]
         # vec[1] = x, vec[2] = y, vec[3] = quantity
         c = City(k, vec[1], vec[2], vec[3])
-        c.getNeighbours(d)
-        cities_dict[k] = c
-    return cities_dict
+        c.getNeighbours(graph)
+        cities_dict_temp[k] = c
+    return cities_dict_temp
 
 
-def choose_the_best_path(lista, cities_list):
-    podsumowanie={}
+#resources is a list of possible paths with an eye to whole_time, cities list has info about "visited"  returns summary - paths with profits
+def choose_the_best_path(resources, cities_list):
+    summary ={}
     g = 0
-    i = 1
-    for j in lista:
-        zysk = 0
-        for krok in j:
-            if cities_list[krok].visited == False:
-                zysk = zysk + cities_list[krok].value
-                cities_list[krok].visited = True
-        podsumowanie[zysk] = j
+    for j in resources:
+        profit = 0
+        for stepOne in j:
+            if cities_list[stepOne].visited == False:
+                profit = profit + cities_list[stepOne].value
+                cities_list[stepOne].visited = True
+        summary[profit] = j
         g = g + 1
-        for krok in j:
-            cities_list[krok].visited = False
-        # print(i)
-        i = i + 1
-    return podsumowanie
+        for stepTwo in j:
+            cities_list[stepTwo].visited = False
+    # print(summary)
+    return summary
 
 
-def return_the_best_value(dict):
-    naj = max(dict.keys())
+# returns the best profit from dictionary which consist of paths with profits
+def return_the_best_value(dict_temp):
+    naj = max(dict_temp.keys())
     return naj
 
 
-def return_cost_of_the_best_path(dict, best):
+# return the cost on the best (from profit side) path
+def return_cost_of_the_best_path(graph, dict_temp_two, best):
     w = 1
-    koszt = 0
-    do = len(dict[best]) - 1
-    for x in dict[best][:do]:
-        koszt = koszt + dict[x][dict[best][w]]
+    cost = 0
+    do = len(dict_temp_two[best]) - 1
+    for x in dict_temp_two[best][:do]:
+        cost = cost + graph[x][dict_temp_two[best][w]]
         w = w + 1
-    return koszt
+    return cost
 
-
-def create_answer_for_path_creation(dict, best):
+# create special form of answer for path creation
+def create_answer_for_path_creation(dict_temp_three, best):
     answer_plot = []
-    do = len(dict[best]) -1
+    do = len(dict_temp_three[best]) -1
     for x in range(do):
-        answer_plot.append((dict[best][x], dict[best][x + 1]))
+        answer_plot.append((dict_temp_three[best][x], dict_temp_three[best][x + 1]))
     return answer_plot
+
+
+def solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
+    assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(paths, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(time, pd.DataFrame), 'Wrong data format!'
+
+    # finds all paths from chosen start point with eye on possible time
+    def find_all_possible_paths(graph, start, time_left, path=[], price=0):
+        nonlocal all_paths
+        time_left = time_left - price
+        path = path + [start]
+        if start not in graph:
+            return []
+        for node in graph[start].keys():
+            if time_left - graph[start][node] >= 0:
+                find_all_possible_paths(graph, node, time_left, path, graph[start][node])
+            elif path not in all_paths:
+                all_paths.append(path)
+            if time_left == 0:
+                break
+        return all_paths
+
+    # general paths creating for all possible starting points
+    def create_all_possible_paths(graph, time_at_the_beggining):
+        list_of_paths = []
+        for x in graph.keys():
+            # all_paths = []
+            list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
+            print(x)
+        return list_of_paths
+
+    working_time = time['time'].values[0]
+
+    d = convert_to_dict(cities, paths)
+
+    all_paths = []
+    possible_paths = create_all_possible_paths(d, working_time)
+
+    cities_dict = create_cities_dictionary(d, cities)
+
+    cities_dict_with_values = choose_the_best_path(possible_paths, cities_dict)
+
+    best_profit = return_the_best_value(cities_dict_with_values)
+
+    cost_of_the_best_path = return_cost_of_the_best_path(d, cities_dict_with_values, best_profit)
+
+    path_answer = create_answer_for_path_creation(cities_dict_with_values, best_profit)
+
+    solution = [working_time - cost_of_the_best_path, best_profit, cities_dict_with_values[best_profit]]
+    return solution, path_answer
