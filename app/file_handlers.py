@@ -10,9 +10,19 @@ Result = namedtuple('Result', ['status', 'msg'])
 
 def save_solution(solution: Output, time: int, new: bool = True) -> None:
     if new:
-        txt = f"{[(c.name, c.x, c.y, c.value) for c in solution.path]}\n{solution.total}\n{time - solution.time_left}"
+        txt = '['
+        for c in solution.path:
+            txt += f'({c.name},{c.x},{c.y},{c.value}),'
+        txt = txt[:-1]
+        txt += ']'
+        txt += f"\n{solution.total}\n{time - solution.time_left}"
     else:
-        txt = f"{[(c.name, c.x, c.y, c.value) for c in solution.path]}\n{solution.total}\n{time}"
+        txt = '['
+        for c in solution.path:
+            txt += f'({c.name},{c.x},{c.y},{c.value}),'
+        txt = txt[:-1]
+        txt += ']'
+        txt += f"\n{solution.total}\n{time}"
     with open('app/tmp/solution.txt', 'w') as file:
         file.write(txt)
 
@@ -123,6 +133,17 @@ def validate_time(df: pd.DataFrame) -> Result:
     return Result(True, 'Success')
 
 
+def parse_city(txt: str) -> City:
+    name, x, y, q = txt.split(',')
+    return City(name, int(x), int(y), int(q))
+
+
+def parse_cities(txt: str) -> list:
+    txt = txt[2:-2]
+    txt = txt.split('),(')
+    return list(map(parse_city, txt))
+
+
 def parse_solution(contents: str) -> str:
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
@@ -131,7 +152,8 @@ def parse_solution(contents: str) -> str:
 
 def solution_to_output(content: str) -> Output:
     cities, total, time = parse_solution(content).split('\n')
-    return Output(time, total, [City(name, x, y, q) for name, x, y, q in eval(cities)])
+
+    return Output(time, total, parse_cities(cities))
 
 
 def validate_solution(content: str) -> Result:
@@ -139,40 +161,25 @@ def validate_solution(content: str) -> Result:
         parsed = parse_solution(content)
         cities, total, time = parsed.split('\n')
     except ValueError:
-        return Result(False, f'Parse error. Input has wrong format!')
+        return Result(False, 'Parse error. Input has wrong format!')
 
     try:
-        cities = eval(cities)
-    except SyntaxError:
-        return Result(False, f'Parse error. Cities list has wrong format')
+       int(str(total))
+    except ValueError:
+        return Result(False, 'Total is not int')
 
-    if not isinstance(cities, list):
-        return Result(False, f'Parse error. Cities list has wrong format')
+    try:
+       int(str(time))
+    except ValueError:
+        return Result(False, 'Total is not int')
 
-    for i, c in enumerate(cities):
-        if not isinstance(c, tuple):
-            return Result(False, f'Parse error. City {i} is not a tuple.')
+    try:
+        parsed_cities = parse_cities(cities)
+    except ValueError:
+        return Result(False, 'Cities list has wrong format')
 
-        if len(c) != 4:
-            return Result(False, f'Parse error. City {i} is not a 4-tuple.')
-
-        name, x, y, q = c
-        try:
-            int(str(x))
-        except ValueError:
-            return Result(False, f'Coordinate x of city {name} is not an integer.')
-
-        try:
-            int(str(y))
-        except ValueError:
-            return Result(False, f'Coordinate y of city {name} is not an integer.')
-
-        try:
-            int(str(q))
-        except ValueError:
-            return Result(False, f'Quantity in city {name} is not an integer.')
-
-        if q < 0:
-            return Result(False, f'Quantity in city {name} has negative value')
+    for c in parsed_cities:
+        if c.value < 0:
+            return Result(False, f'Quantity in city {c.name} is negative.')
 
     return Result(True, 'Success')

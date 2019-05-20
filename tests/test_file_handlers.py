@@ -228,6 +228,7 @@ class TestSolution:
         with open('app/tmp/solution.txt', 'r') as file:
             contents = file.read()
 
+        print(contents)
         contents = str.encode('filename,') + base64.b64encode(str.encode(contents))
         return contents.decode('utf8')
 
@@ -236,7 +237,7 @@ class TestSolution:
         contents = str.encode('filename,') + base64.b64encode(str.encode(contents))
         return contents.decode('utf8')
 
-    def test_ok(self):
+    def test_saving(self):
         path = [
             City(name='A', x=0, y=0),
             City(name='B', x=1, y=0)
@@ -253,6 +254,13 @@ class TestSolution:
         cities, total, time = parsed.split('\n')
         assert int(total) == 45
         assert int(time) == 8
+
+    def test_parsing(self):
+        contents = self.prepare('[(name,1,2,3)]\n12\n23')
+
+        result: Result = validate_solution(contents)
+        assert result.status
+        assert 'success' in result.msg.lower()
 
     def test_error_1(self):
         contents = self.prepare('someinfo')
@@ -281,41 +289,38 @@ class TestSolution:
 
         result: Result = validate_solution(contents)
         assert not result.status
-        assert 'is not a tuple' in result.msg
+        assert 'Cities list has wrong format' in result.msg
 
     def test_error_5(self):
         contents = self.prepare('[(1,2)]\n12\n23')
 
         result: Result = validate_solution(contents)
         assert not result.status
-        assert 'is not a 4-tuple' in result.msg
+        assert 'Cities list has wrong format' in result.msg
 
     def test_error_6(self):
-        contents = self.prepare("[('name','x',0,2)]\n12\n23")
+        contents = self.prepare("[(name,x,0,2)]\n12\n23")
 
         result: Result = validate_solution(contents)
         assert not result.status
-        assert 'x' in result.msg
-        assert 'is not an integer' in result.msg
+        assert 'Cities list has wrong format' in result.msg
 
     def test_error_7(self):
-        contents = self.prepare("[('name',0,'y',2)]\n12\n23")
+        contents = self.prepare("[(name,0,y,2)]\n12\n23")
 
         result: Result = validate_solution(contents)
         assert not result.status
-        assert 'y' in result.msg
-        assert 'is not an integer' in result.msg
+        assert 'Cities list has wrong format' in result.msg
 
     def test_error_8(self):
-        contents = self.prepare("[('name',0,0,'q')]\n12\n23")
+        contents = self.prepare("[(name,0,0,q)]\n12\n23")
 
         result: Result = validate_solution(contents)
         assert not result.status
-        assert 'Quantity' in result.msg
-        assert 'is not an integer' in result.msg
+        assert 'Cities list has wrong format' in result.msg
 
     def test_error_9(self):
-        contents = self.prepare("[('name',0,0,-2)]\n12\n23")
+        contents = self.prepare("[(name,0,0,-2)]\n12\n23")
 
         result: Result = validate_solution(contents)
         assert not result.status

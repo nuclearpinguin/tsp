@@ -15,8 +15,8 @@ def make_plot_data(cities: pd.DataFrame,
     check = lambda fc, tc: ((fc, tc) in selected_edges) or ((tc, fc) in selected_edges)
 
     cities = [City(name, x, y, q) for name, x, y, q in cities.values]
-    edges = ((from_c, to_c, {'time': t, 'solution': check(from_c, to_c)})
-             for from_c, to_c, t in paths.values)
+    edges = [(from_c, to_c, {'time': t, 'solution': check(from_c, to_c)})
+             for from_c, to_c, t in paths.values]
 
     return solution, cities, edges
 
