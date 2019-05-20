@@ -140,6 +140,9 @@ def parse_city(txt: str) -> City:
 
 def parse_cities(txt: str) -> list:
     txt = txt[2:-2]
+    # In case of Windows shit \r\n
+    if txt[-1] == ')':
+        txt = txt[:-1]
     txt = txt.split('),(')
     return list(map(parse_city, txt))
 
@@ -152,7 +155,6 @@ def parse_solution(contents: str) -> str:
 
 def solution_to_output(content: str) -> Output:
     cities, total, time = parse_solution(content).split('\n')
-
     return Output(time, total, parse_cities(cities))
 
 
@@ -161,7 +163,7 @@ def validate_solution(content: str) -> Result:
         parsed = parse_solution(content)
         cities, total, time = parsed.split('\n')
     except ValueError:
-        return Result(False, 'Parse error. Input has wrong format!')
+        return Result(False, 'Parse error. Three lines required.')
 
     try:
        int(str(total))
@@ -176,7 +178,7 @@ def validate_solution(content: str) -> Result:
     try:
         parsed_cities = parse_cities(cities)
     except ValueError:
-        return Result(False, 'Cities list has wrong format')
+        return Result(False, 'Parse error. Cities list has wrong format')
 
     for c in parsed_cities:
         if c.value < 0:
