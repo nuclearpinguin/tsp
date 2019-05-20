@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import base64
 from collections import namedtuple, Counter
-from typing import Tuple, Union
 
 from app.solvers import Output, City
 
@@ -63,6 +62,7 @@ def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
 
     unique_paths = df.city_from.unique().tolist() + df.city_to.unique().tolist()
     unique_paths = list(set(unique_paths))
+
     unique_paths.sort()
 
     ucl = len(unique_cities)
@@ -136,7 +136,8 @@ def solution_to_output(content: str) -> Output:
 
 def validate_solution(content: str) -> Result:
     try:
-        cities, total, time = parse_solution(content).split('\n')
+        parsed = parse_solution(content)
+        cities, total, time = parsed.split('\n')
     except ValueError:
         return Result(False, f'Parse error. Input has wrong format!')
 
