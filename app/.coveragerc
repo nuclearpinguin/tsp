@@ -1,0 +1,5 @@
+[run]
+omit =
+    app/app_factory.py
+    app/components.py
+    app/helpers.py

@@ -24,7 +24,7 @@ def create_app():
     Dash app factory and layout definition
     """
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets, sharing=True)
-    # app.config['suppress_callback_exceptions'] = True
+    app.config['suppress_callback_exceptions'] = True
 
     app.layout = html.Div([
         dcc.Store(id='memory'),
@@ -40,17 +40,17 @@ def create_app():
             html.Table(children=[
                 html.Tr(id='upload-row', children=[
                     html.Td(children=[
-                        comp.upload(idx='city-input', name='First upload city-matrix...'),
+                        comp.upload(idx='city-input', name='City coordinates:'),
                         html.Div(id='output-city')],
                         style={'width': '33%', 'vertical-align': 'top'}),
 
                     html.Td(children=[
-                        comp.upload(idx='paths-input', name='...now we need coordinates...'),
+                        comp.upload(idx='paths-input', name='Paths information'),
                         html.Div(id='paths-output')],
                         style={'width': '33%', 'vertical-align': 'top'}),
 
                     html.Td(children=[
-                        comp.upload(idx='time-solution--input', name='...finally add some info'),
+                        comp.upload(idx='time-solution-input', name='Magic .csv with time:'),
                         html.Div(id='time-output')],
                         style={'width': '33%', 'vertical-align': 'top'}),
                 ]),
@@ -97,10 +97,10 @@ def create_app():
             df = parse_contents(content)
             result = fh.validate_cities(df)
             if not result.status:
-                return comp.error(result.msg),
+                return comp.error(result.msg)
 
-            return comp.upload_table(name, df),
-        return None,
+            return comp.upload_table(name, df)
+        return [None]
 
     @app.callback([Output('paths-output', 'children')],
                   [Input('paths-input', 'contents'), Input('city-input', 'contents')],
@@ -114,14 +114,14 @@ def create_app():
             cities = parse_contents(cities)
             result = fh.validate_paths(df, cities)
             if not result.status:
-                return comp.error(result.msg),
+                return comp.error(result.msg)
 
-            return comp.upload_table(name, df),
-        return None,
+            return comp.upload_table(name, df)
+        return [None]
 
     @app.callback([Output('time-output', 'children')],
-                  [Input('type-switch', 'on'), Input('time-solution--input', 'contents')],
-                  [State('time-solution--input', 'filename')])
+                  [Input('type-switch', 'on'), Input('time-solution-input', 'contents')],
+                  [State('time-solution-input', 'filename')])
     def upload_time_solution(old_solution, content, name):
         if old_solution and content:
             if '.txt' not in name:
@@ -129,27 +129,27 @@ def create_app():
 
             result = fh.validate_solution(content)
             if not result.status:
-                return comp.error(result.msg),
-            return html.Div([html.P(f'File {name} successfully uploaded!')]),
+                return comp.error(result.msg)
+            return [html.Div([html.P(f'File {name} successfully uploaded!')])]
 
         if content:
             if '.csv' not in name:
-                return html.Div(comp.error('Only .csv files ar supported!')),
+                return [html.Div(comp.error('Only .csv files ar supported!'))]
 
             df = parse_contents(content)
             result = fh.validate_time(df)
             if not result.status:
-                return comp.error(result.msg),
+                return comp.error(result.msg)
 
-            return comp.upload_table(name, df),
-        return None,
+            return comp.upload_table(name, df)
+        return [None]
 
     @app.callback([Output('tsp-solution', 'children'), Output('memory', 'data')],
                   [Input('type-switch', 'on'),
                    Input('solve-btn', 'n_clicks'),
                    Input('city-input', 'contents'),
                    Input('paths-input', 'contents'),
-                   Input('time-solution--input', 'contents'),
+                   Input('time-solution-input', 'contents'),
                    Input('simulations-slider', 'value'),
                    ],
                   [State('memory', 'data')])
@@ -206,7 +206,7 @@ def create_app():
 
             return output, cache
 
-        return [], None
+        return [None], None
 
     @app.callback([Output('tsp-graph', 'children')],
                   [Input('memory', 'data'), Input('plot-switch', 'on')],
@@ -244,7 +244,7 @@ def create_app():
             title = ['Old problem']
             row = [
             html.Td(children=[
-                comp.upload(idx='time-solution--input', name='Upload solution'),
+                comp.upload(idx='time-solution-input', name='Upload solution'),
                 html.Div(id='time-output')],
                 style={'width': '33%', 'vertical-align': 'top'}),
 
@@ -263,17 +263,17 @@ def create_app():
         title = ['New problem']
         row = [
             html.Td(children=[
-                comp.upload(idx='city-input', name='First upload city-matrix...'),
+                comp.upload(idx='city-input', name='City coordinates:'),
                 html.Div(id='output-city')],
                 style={'width': '33%', 'vertical-align': 'top'}),
 
             html.Td(children=[
-                comp.upload(idx='paths-input', name='...now we need coordinates...'),
+                comp.upload(idx='paths-input', name='Paths information'),
                 html.Div(id='paths-output')],
                 style={'width': '33%', 'vertical-align': 'top'}),
 
             html.Td(children=[
-                comp.upload(idx='time-solution--input', name='...finally add some info'),
+                comp.upload(idx='time-solution-input', name='Magic .csv with time:'),
                 html.Div(id='time-output')],
                 style={'width': '33%', 'vertical-align': 'top'}),
         ]

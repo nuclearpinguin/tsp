@@ -8,7 +8,7 @@ from app.helpers import make_graph
 
 
 def error(msg: str):
-    return html.P(msg, style={'color': 'red'})
+    return [html.P(msg, style={'color': 'red'})]
 
 
 def button(idx: str, txt: str, align: str = 'right'):
@@ -61,20 +61,22 @@ def upload(idx: str, name: str = 'Select Files'):
 def stats(solve_time: float, solution, cities):
     return [
         html.Div([
-            html.H6('SOLUTION:'),
             html.Li(html.P(f'Solving time: {solve_time:.4f}')),
             html.Li(html.P(f"Path: {', '.join([c.name for c in solution.path])}")),
             html.Li(html.P(f'Time left: {solution.time_left}')),
             html.Li(html.P(f'Earned / total: {solution.total}')),
             html.Li(html.P(f'Mean quantity: {float(np.mean([c.value for c in cities])):.2f}')),
-            html.A('Download', href="/tmp/solution", target='blank')
+            html.A('Download',
+                   href="/tmp/solution", target='blank',
+                   style={'font-size': '16pt', 'text-transform': 'uppercase'}
+                   )
             ])
     ]
 
 
 def upload_table(name: str, df: pd.DataFrame):
     df = df.iloc[:20, :]
-    return html.Div([
+    return [html.Div([
         html.P(f'File {name} successfully uploaded!'),
         dash_table.DataTable(
             data=df.to_dict('rows'),
@@ -83,7 +85,7 @@ def upload_table(name: str, df: pd.DataFrame):
             n_fixed_rows=1,
             style_table={'maxHeight': '300px'},
         ),
-    ])
+    ])]
 
 
 def vbar():

@@ -48,7 +48,7 @@ def validate_cities(df: pd.DataFrame) -> Result:
 
 
 def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
-    if list(df.columns) != ['city_from', 'city_to', 'time']:
+    if list(df.columns) != ['city_from', 'city_to', 'travel_time']:
         return Result(False, 'Wrong columns names!')
 
     # Each city can have at most 4 neighbours

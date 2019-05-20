@@ -5,7 +5,7 @@ from time import sleep
 
 def unique(xs: list):
     seen = set()  # < keep track of what we have seen as we go
-    unique_list = [x for x in xs if not ((x[0], x[1]) in seen or seen.add((x[0], x[1])))]
+    unique_list = [x for x in xs if not ((x[1], x[0]) in seen or (x[0], x[1]) in seen or seen.add((x[0], x[1])))]
     return unique_list
 
 
