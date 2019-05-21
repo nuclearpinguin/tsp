@@ -4,14 +4,14 @@ import plotly.graph_objs as go
 import networkx as nx
 import pandas as pd
 from plotly.graph_objs.scatter import Marker
-from typing import List, Tuple
+from typing import List
 from functools import reduce
 from time import time as now
 
 from app.solvers import City
 
 
-def prepare_data(cities: List[City]):
+def prepare_data(cities: List[City]) -> list:
     return [(city.name, {'pos': (city.x, city.y), 'name': city.name, 'quantity': city.value})
             for city in cities]
 
@@ -40,7 +40,7 @@ def _color_edge(info: dict) -> dict:
     return dict(width=0.8, color='#888')
 
 
-def make_graph(nodes: List[City], edges: List[Tuple[str, str]]):
+def make_graph(nodes: list, edges: list):
     G = nx.Graph()
 
     # Create graph
@@ -64,6 +64,7 @@ def make_graph(nodes: List[City], edges: List[Tuple[str, str]]):
     add = edge_traces.append
     for edge in G.edges(data=True):
         a, b, info = edge
+
         x0, y0 = G.node[a]['pos']
         x1, y1 = G.node[b]['pos']
         trace = go.Scatter(

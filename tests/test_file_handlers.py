@@ -24,6 +24,20 @@ class TestCityCsvValidation:
         assert result.status
         assert result.msg.lower() == 'success'
 
+    def test_cities_ok_city_numbers(self):
+        xs = [
+            {'name': 1, 'x': 0, 'y': 0, 'quantity': 12},
+            {'name': 2, 'x': 1, 'y': 0, 'quantity': 12},
+            {'name': 3, 'x': 2, 'y': 0, 'quantity': 12},
+        ]
+
+        df = pd.DataFrame(xs, columns=['name', 'x', 'y', 'quantity'])
+        print(df.columns)
+
+        result: Result = validate_cities(df)
+        assert result.status
+        assert result.msg.lower() == 'success'
+
     def test_cities_error1(self):
         xs = [
             {'name1': 'A', 'x': 0, 'y': 0, 'quantity': 12},
@@ -103,6 +117,25 @@ class TestPathsCsvValidation:
             {'name': 'A', 'x': 0, 'y': 0, 'quantity': 10},
             {'name': 'B', 'x': 1, 'y': 0, 'quantity': 10},
             {'name': 'C', 'x': 2, 'y': 0, 'quantity': 10},
+        ]
+
+        cities = pd.DataFrame(cities, columns=['name', 'x', 'y', 'quantity'])
+        df = pd.DataFrame(xs, columns=['city_from', 'city_to', 'travel_time'])
+
+        result: Result = validate_paths(df, cities)
+        assert result.status
+        assert result.msg.lower() == 'success'
+
+    def test_paths_ok_city_numbers(self):
+        xs = [
+            {'city_from': 1, 'city_to': 2, 'travel_time': 1},
+            {'city_from': 2, 'city_to': 3, 'travel_time': 1},
+        ]
+
+        cities = [
+            {'name': 1, 'x': 0, 'y': 0, 'quantity': 10},
+            {'name': 2, 'x': 1, 'y': 0, 'quantity': 10},
+            {'name': 3, 'x': 2, 'y': 0, 'quantity': 10},
         ]
 
         cities = pd.DataFrame(cities, columns=['name', 'x', 'y', 'quantity'])
@@ -257,6 +290,13 @@ class TestSolution:
 
     def test_parsing(self):
         contents = self.prepare('[(name,1,2,3)]\n12\n23')
+
+        result: Result = validate_solution(contents)
+        assert result.status
+        assert 'success' in result.msg.lower()
+
+    def test_parsing_city_number(self):
+        contents = self.prepare('[(12,1,2,3)]\n12\n23')
 
         result: Result = validate_solution(contents)
         assert result.status

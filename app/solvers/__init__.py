@@ -10,6 +10,11 @@ def make_plot_data(cities: pd.DataFrame,
                    time: pd.DataFrame,
                    simulations: int = 50,
                    time_limit: int = 20):
+
+    cities['name'] = cities.name.apply(lambda x: str(x))
+    paths['city_from'] = paths.city_from.apply(lambda x: str(x))
+    paths['city_to'] = paths.city_to.apply(lambda x: str(x))
+
     solution, selected_edges = solve(cities, paths, time, simulations, time_limit)
 
     check = lambda fc, tc: ((fc, tc) in selected_edges) or ((tc, fc) in selected_edges)
@@ -25,6 +30,10 @@ def data_from_solution(cities: Union[pd.DataFrame, None],
                        paths: Union[pd.DataFrame, None],
                        solution: Output) -> Tuple[list, list]:
     if (cities is not None) and (paths is not None):
+        cities['name'] = cities.name.apply(lambda x: str(x))
+        paths['city_from'] = paths.city_from.apply(lambda x: str(x))
+        paths['city_to'] = paths.city_to.apply(lambda x: str(x))
+
         selected_edges = [(cf.name, ct.name) for cf, ct in zip(solution.path[:-1], solution.path[1:])]
 
         check = lambda fc, tc: ((fc, tc) in selected_edges) or ((tc, fc) in selected_edges)

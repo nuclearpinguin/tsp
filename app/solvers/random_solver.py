@@ -56,6 +56,10 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
         curr_city.visited = True
 
         # select random neighbour
+        nghbrs = list(curr_city.neighbours.keys())
+        if not nghbrs:
+            break
+
         next_city = random.choice(list(curr_city.neighbours.keys()))
 
         # if the city was visited - draw again

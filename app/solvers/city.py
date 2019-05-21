@@ -6,15 +6,12 @@ class City:
 
     def __init__(self, name: str, x: int, y: int, value: int = 0) -> None:
         """ Initializes attributes. """
-        self.name = name
+        self.name = str(name)
         self.x = x
         self.y = y
         self.value = value
         self.neighbours = {}
         self.visited = False
-
-    def set_coords(self, df_cities: pd.DataFrame) -> None:
-        self.x = df_cities.loc[df_cities['name']]
 
     def set_neighbours(self, d) -> None:
         self.neighbours = d.get(self.name, {})   # get the dictionary of pairs {neighbour:travel_time}
