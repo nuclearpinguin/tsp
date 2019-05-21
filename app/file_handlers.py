@@ -135,7 +135,7 @@ def validate_time(df: pd.DataFrame) -> Result:
 
 def parse_city(txt: str) -> City:
     name, x, y, q = txt.split(',')
-    return City(str(name), int(x), int(y), int(q))
+    return City(name, int(x), int(y), int(q))
 
 
 def parse_cities(txt: str) -> list:
