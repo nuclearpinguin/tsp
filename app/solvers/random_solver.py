@@ -93,25 +93,14 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
     return Output(time_left, total, path)
 
 
-<<<<<<< HEAD
-def find_best_of_random_paths(cities_dict: dict,
-                              working_time: int,
-                              n: int,
-                              time_limit: int) -> Output:
-=======
 def find_best_of_random_paths(cities_dict: dict, working_time: int, random_walk_trials: int, time_limit: int) -> Output:
->>>>>>> 61d86aaf1ea826dff52836c67b903483df89b415
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
     :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
     :param working_time: limits the duration of single path
-<<<<<<< HEAD
     :param n: number of trials for each vertex in random walk
-    :param time_limit: max number of seconds the algorithm can work
-=======
     :param random_walk_trials: number of trials for each vertex in random walk
     :param time_limit: in seconds, until computation is interrupted and the best path found as far is chosen
->>>>>>> 61d86aaf1ea826dff52836c67b903483df89b415
     """
 
     start_time = time()
@@ -173,11 +162,9 @@ def solve(cities: pd.DataFrame,
     working_time = info['time'].values[0]
 
     # compute the best path
-<<<<<<< HEAD
     solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
-=======
+
     # TODO: change last parameter from 50 to value taken from slider
     solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, 50)
->>>>>>> 61d86aaf1ea826dff52836c67b903483df89b415
 
     return solution, convert_to_edges_list(solution.path)
