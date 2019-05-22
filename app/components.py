@@ -58,12 +58,19 @@ def upload(idx: str, name: str = 'Select Files'):
     ])
 
 
-def stats(solve_time: float, solution, cities):
+def stats(solve_time: float, solution, cities, input_time: int = 0, new: bool =True):
+    if new:
+        worked_time = input_time - solution.time_left
+        time_left = solution.time_left
+    else:
+        worked_time = solution.time_left
+        time_left = '?'
     return [
         html.Div([
             html.Li(html.P(f'Solving time: {solve_time:.4f}')),
             html.Li(html.P(f"Path: {', '.join([c.name for c in solution.path])}")),
-            html.Li(html.P(f'Time left: {solution.time_left}')),
+            html.Li(html.P(f'Time worked: {worked_time}')),
+            html.Li(html.P(f'Time left: {time_left}')),
             html.Li(html.P(f'Earned / total: {solution.total}')),
             html.Li(html.P(f'Mean quantity: {float(np.mean([c.value for c in cities])):.2f}')),
             html.A('Download',

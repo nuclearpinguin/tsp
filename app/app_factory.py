@@ -71,7 +71,7 @@ def create_app():
             ),
             html.Div(id='time-slider-output', style={'margin-top': '10px'}),
             dcc.Slider(min=5, max=65, value=15, id='time-slider',
-                       marks={(5 * (i+1)): f'{5 * (i+1)}s' if i != 12 else 'Inf' for i in range(13)}),
+                       marks={(5 * (i+1)): f'{5 * (i+1)}s' for i in range(13)}),
 
             html.Div(id='simulations-slider-output', style={'margin-top': '40px'}),
             dcc.Slider(min=10, max=490, value=90, id='simulations-slider',
@@ -176,7 +176,7 @@ def create_app():
 
                 # Generate html elements
                 output = [html.H3(children='Solution'), comp.vbar()]
-                output += comp.stats(0.0, solution, cities)
+                output += comp.stats(0.0, solution, cities, new=False)
 
                 # Cache data
                 cache = {'cities': prepare_data(cities), 'edges': list(edges)}
@@ -201,7 +201,7 @@ def create_app():
 
             # Generate html elements
             output = [html.H3(children='Solution'), comp.vbar()]
-            output += comp.stats(solving_time, solution, cities)
+            output += comp.stats(solving_time, solution, cities, df_time.time.values[0])
 
             # Cache data
             cache = {'cities': prepare_data(cities), 'edges': list(edges)}
