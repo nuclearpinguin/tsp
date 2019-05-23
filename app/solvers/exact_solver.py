@@ -151,7 +151,7 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         for x in graph.keys():
             # all_paths = []
             list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
-            print(x)
+            #print(x)
         return list_of_paths
 
     working_time = time['time'].values[0]
@@ -178,10 +178,15 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 
     solution = [working_time - path_time, best_profit, cities_dict_with_values[best_profit]]
 
-    print(solution)
-
+    #print(solution)
+    
+    # set a list composed of City objects, for historical reasons
+    result_path = []
+    for item in path_answer:
+        result_path.append(cities_dict[item[0]])
+    
     output = Output(time_left=working_time - path_time,
-                    path=path_answer,
+                    path=result_path,
                     total=best_profit)
-    print(output)
-    return output, []
+    #print(output)
+    return result_path, path_answer
