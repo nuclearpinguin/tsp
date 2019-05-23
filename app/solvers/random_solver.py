@@ -10,12 +10,15 @@ Output = namedtuple('Output', ['time_left', 'total', 'path'])
 
 def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     """
-    Converts data frames of cities and paths to a dictionary
-    {city: {neighbour : time_to_neighbour}}.
+    Converts data frames of cities and paths to a dictionary {city: {neighbour : time_to_neighbour}}.
 
-    :param df_cities: pandas.read_csv("cities.csv")
-    :param df_paths: pandas.read_csv("paths.csv")
-    :return: dictionary {city: {neighbour : time_to_neighbour}}
+    Parameters
+    ----------
+    df_cities - pandas.read_csv("cities.csv")
+    df_paths - pandas.read_csv("paths.csv")
+
+    Returns dictionary containing {city: {neighbour : time_to_neighbour}}
+    -------
     """
 
     dict_paths = {}
@@ -33,9 +36,20 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
 
 
 def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> Output:
-    """ Generates a list containing: time, total and random path. """
+    """
+    Sets random path, trying not to walk through a city multiple times.
 
-    path = []
+    Parameters
+    ----------
+    cities_dict - dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    starting_city - City object, from which the path starts
+    time_left - amount of hours until salesman can travel no more
+
+    Returns a tuple containing: time, total and random path.
+    -------
+    """
+
+    path=[]
     tmp_time = time_left
     total = 0
     curr_city = cities_dict[starting_city]
@@ -102,11 +116,17 @@ def find_best_of_random_paths(cities_dict: dict,
                               n: int,
                               time_limit: int) -> Output:
     """
+
+
+    Parameters
+    ----------
+    cities_dict - dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    working_time - limits the duration of single path
+    n - number of trials for each vertex in random walk
+    time_limit - max number of seconds the algorithm can work
+
     Returns list [time_left, sum, path] for the best of paths found in random walk.
-    :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
-    :param working_time: limits the duration of single path
-    :param n: number of trials for each vertex in random walk
-    :param time_limit: max number of seconds the algorithm can work
+    -------
     """
 
     start_time = time()
@@ -135,7 +155,18 @@ def find_best_of_random_paths(cities_dict: dict,
     return best_paths[0]
 
 
-def convert_to_edges_list(paths: list):
+def convert_to_edges_list(paths: list) -> list:
+    """
+    Converts list of City objects to list which can be passed to output file.
+
+    Parameters
+    ----------
+    paths - list of City objects
+
+    Returns list of city names in order of visits.
+    -------
+
+    """
     path = [(cf.name, ct.name)
             for cf, ct in zip(paths[:-1], paths[1:])]
     return path
