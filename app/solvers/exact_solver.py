@@ -5,9 +5,15 @@ from .random_solver import convert_to_dict, Output
 
 def choose_the_best_path(resources, cities_list):
     """
-    Resource is a list of possible paths with an eye on possible time
-    cities list is used to hold an information if city has been visited or not
-    function returns summary - path with profits
+         
+    Parameters
+    ----------
+    resources - list of all possible paths [[path_1], [path_2], [path_3], ...]
+    cities_list - list of all possible cities [city_A, city_B, city_C,..]
+
+    Returns
+    -------
+    A dictionary - values with paths {'value_1' : [path_i], 'value_2' : [path_y],...}
     """
     summary = {}
     g = 0
@@ -25,13 +31,33 @@ def choose_the_best_path(resources, cities_list):
 
 
 def return_the_best_value(dict_temp):
-    """Returns the best profit from dictionary which consist of paths with profits."""
+    """
+    Returns the best profit from dictionary which consist of paths with profits.
+    Parameters
+    ----------
+    dict_temp - dictionary - values with paths {'value_1' : [path_i], 'value_2' : [path_y],...}
+
+    Returns 
+    -------
+    The best possible value
+    """
     naj = max(dict_temp.keys())
     return naj
 
 
 def return_path_time(graph, dict_temp_two, best):
-    """Returns the cost on the best (from profit side) path"""
+    """
+    Returns the cost on the best (from profit side) path
+    Parameters
+    ----------
+    graph
+    dict_temp_two - dictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best - the best possible value - value_y
+
+    Returns 
+    -------
+    Time which is used to do the best path
+    """
     w = 1
     cost = 0
     do = len(dict_temp_two[best]) - 1
@@ -42,7 +68,17 @@ def return_path_time(graph, dict_temp_two, best):
 
 
 def create_answer_for_path_creation(dict_temp_three, best):
-    """Creates special form of answer for path creation"""
+    """
+    Creates special form of answer for path creation
+    Parameters
+    ----------
+    dict_temp_three - ictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best - the best possible value - value_y
+
+    Returns 
+    -------
+    A special list of cities - [{city_1,city_2),(city_2,city_3),...]
+    """
     answer_plot = []
     do = len(dict_temp_three[best]) - 1
     for x in range(do):
@@ -51,6 +87,18 @@ def create_answer_for_path_creation(dict_temp_three, best):
 
 
 def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, time_limit: int = 20):
+    """
+
+    Parameters
+    ----------
+    cities - framework with possible cities 
+    paths - framework with possible paths 
+    time - framework with possible time
+
+    Returns
+    -------
+    Solution
+    """
     print('Works exact')
 
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
@@ -58,7 +106,20 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
     assert isinstance(time, pd.DataFrame), 'Wrong data format!'
 
     def find_all_possible_paths(graph, start, time_left, path=[], time_used=0):
-        """ Finds all paths from chosen start point with eye on possible time """
+        """
+
+        Parameters
+        ----------
+        graph
+        start - starting node
+        time_left - time which still can be used for next steps in path creations 
+        path - list of cities on path [city_1, city_2, city_3]
+        time_used - information how much time has been used
+
+        Returns 
+        -------
+        A list - [city_1, city_2, city_3, city_4]
+        """
         nonlocal all_paths
         time_left = time_left - time_used
         path = path + [start]
@@ -75,12 +136,22 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         return all_paths
 
     def create_all_possible_paths(graph, time_at_the_beggining):
-        """ General paths creating for all possible starting points """
+        """
+
+        Parameters
+        ----------
+        graph - graph which we will use to create paths
+        time_at_the_beggining - time at the beggining of path creation
+
+        Returns 
+        -------
+        A list [[path_1], [path_2], [path_3], ...]
+        """
         list_of_paths = []
         for x in graph.keys():
             # all_paths = []
             list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
-            print(x)
+            #print(x)
         return list_of_paths
 
     working_time = time['time'].values[0]
@@ -107,10 +178,15 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 
     solution = [working_time - path_time, best_profit, cities_dict_with_values[best_profit]]
 
-    print(solution)
-
+    #print(solution)
+    
+    # set a list composed of City objects, for historical reasons
+    result_path = []
+    for item in path_answer:
+        result_path.append(cities_dict[item[0]])
+    
     output = Output(time_left=working_time - path_time,
-                    path=path_answer,
+                    path=result_path,
                     total=best_profit)
-    print(output)
-    return output, []
+    #print(output)
+    return result_path, path_answer
