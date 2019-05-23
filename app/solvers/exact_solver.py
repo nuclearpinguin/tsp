@@ -5,17 +5,15 @@ from .random_solver import convert_to_dict, Output
 
 def choose_the_best_path(resources, cities_list):
     """
-    Resource is a list of possible paths with an eye on possible time
-        cities list is used to hold an information if city has been visited or not
-        function returns summary - path with profits 
+         
     Parameters
     ----------
-    resources - list [[path_1], [path_2], [path_3], ...]
-    cities_list - list [city_A, city_B, city_C,..]
+    resources - list of all possible paths [[path_1], [path_2], [path_3], ...]
+    cities_list - list of all possible cities [city_A, city_B, city_C,..]
 
-    Returns - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
+    Returns
     -------
-
+    A dictionary - values with paths {'value_1' : [path_i], 'value_2' : [path_y],...}
     """
     summary = {}
     g = 0
@@ -37,11 +35,11 @@ def return_the_best_value(dict_temp):
     Returns the best profit from dictionary which consist of paths with profits.
     Parameters
     ----------
-    dict_temp - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
+    dict_temp - dictionary - values with paths {'value_1' : [path_i], 'value_2' : [path_y],...}
 
-    Returns - numer : value_y
+    Returns 
     -------
-
+    The best possible value
     """
     naj = max(dict_temp.keys())
     return naj
@@ -53,12 +51,12 @@ def return_path_time(graph, dict_temp_two, best):
     Parameters
     ----------
     graph
-    dict_temp_two - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
-    best - number - value_y
+    dict_temp_two - dictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best - the best possible value - value_y
 
-    Returns - number 
+    Returns 
     -------
-
+    Time which is used to do the best path
     """
     w = 1
     cost = 0
@@ -74,12 +72,12 @@ def create_answer_for_path_creation(dict_temp_three, best):
     Creates special form of answer for path creation
     Parameters
     ----------
-    dict_temp_three - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
-    best - number - value_y
+    dict_temp_three - ictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best - the best possible value - value_y
 
-    Returns - list - [{city_1,city_2),(city_2,city_3),...]
+    Returns 
     -------
-
+    A special list of cities - [{city_1,city_2),(city_2,city_3),...]
     """
     answer_plot = []
     do = len(dict_temp_three[best]) - 1
@@ -93,13 +91,13 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 
     Parameters
     ----------
-    cities
-    paths
-    time
+    cities - framework with possible cities 
+    paths - framework with possible paths 
+    time - framework with possible time
 
     Returns
     -------
-
+    Solution
     """
     print('Works exact')
 
@@ -113,14 +111,14 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         Parameters
         ----------
         graph
-        start - letter 
-        time_left - number 
-        path - list [city_1, city_2, city_3]
-        time_used - number
+        start - starting node
+        time_left - time which still can be used for next steps in path creations 
+        path - list of cities on path [city_1, city_2, city_3]
+        time_used - information how much time has been used
 
-        Returns - list - [city_1, city_2, city_3, city_4]
+        Returns 
         -------
-
+        A list - [city_1, city_2, city_3, city_4]
         """
         nonlocal all_paths
         time_left = time_left - time_used
@@ -142,12 +140,12 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 
         Parameters
         ----------
-        graph
-        time_at_the_beggining - number
+        graph - graph which we will use to create paths
+        time_at_the_beggining - time at the beggining of path creation
 
-        Returns - list [[path_1], [path_2], [path_3], ...]
+        Returns 
         -------
-
+        A list [[path_1], [path_2], [path_3], ...]
         """
         list_of_paths = []
         for x in graph.keys():
