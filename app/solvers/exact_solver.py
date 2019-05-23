@@ -189,4 +189,4 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
                     path=result_path,
                     total=best_profit)
     #print(output)
-    return result_path, path_answer
+    return output, path_answer
