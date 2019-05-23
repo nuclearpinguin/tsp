@@ -10,10 +10,10 @@ def choose_the_best_path(resources, cities_list):
         function returns summary - path with profits 
     Parameters
     ----------
-    resources
-    cities_list
+    resources - list [[path_1], [path_2], [path_3], ...]
+    cities_list - list [city_A, city_B, city_C,..]
 
-    Returns
+    Returns - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
     -------
 
     """
@@ -37,9 +37,9 @@ def return_the_best_value(dict_temp):
     Returns the best profit from dictionary which consist of paths with profits.
     Parameters
     ----------
-    dict_temp
+    dict_temp - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
 
-    Returns
+    Returns - numer : value_y
     -------
 
     """
@@ -53,10 +53,10 @@ def return_path_time(graph, dict_temp_two, best):
     Parameters
     ----------
     graph
-    dict_temp_two
-    best
+    dict_temp_two - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best - number - value_y
 
-    Returns
+    Returns - number 
     -------
 
     """
@@ -74,10 +74,10 @@ def create_answer_for_path_creation(dict_temp_three, best):
     Creates special form of answer for path creation
     Parameters
     ----------
-    dict_temp_three
-    best
+    dict_temp_three - dictionary {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best - number - value_y
 
-    Returns
+    Returns - list - [{city_1,city_2),(city_2,city_3),...]
     -------
 
     """
@@ -113,12 +113,12 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         Parameters
         ----------
         graph
-        start
-        time_left
-        path
-        time_used
+        start - letter 
+        time_left - number 
+        path - list [city_1, city_2, city_3]
+        time_used - number
 
-        Returns
+        Returns - list - [city_1, city_2, city_3, city_4]
         -------
 
         """
@@ -143,9 +143,9 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         Parameters
         ----------
         graph
-        time_at_the_beggining
+        time_at_the_beggining - number
 
-        Returns
+        Returns - list [[path_1], [path_2], [path_3], ...]
         -------
 
         """
