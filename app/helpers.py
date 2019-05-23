@@ -12,13 +12,16 @@ from app.solvers import City
 
 
 def prepare_data(cities: List[City]) -> list:
+    """
+    Convert list of Cities to format required by make_graph.
+    """
     return [(city.name, {'pos': (city.x, city.y), 'name': city.name, 'quantity': city.value})
             for city in cities]
 
 
 def parse_contents(contents: str, columns=None) -> pd.DataFrame:
     """
-    Helper for parsing uploaded .csv file
+    Helper for parsing uploaded .csv file.
     """
     if not contents:
         return pd.DataFrame([])
@@ -35,12 +38,27 @@ def parse_contents(contents: str, columns=None) -> pd.DataFrame:
 
 
 def _color_edge(info: dict) -> dict:
+    """
+    Sets color of an edge if it's a part of solution.
+    """
     if info['solution']:
         return dict(width=8, color='#1EAEDB')
     return dict(width=0.8, color='#888')
 
 
 def make_graph(nodes: list, edges: list):
+    """
+    Creates plotly network graph.
+
+    Parameters
+    ----------
+    nodes - list of nodes compatible with networx
+    edges - list of edges compatible with networx
+
+    Returns
+    -------
+    plotly.graph_objs.Figure
+    """
     G = nx.Graph()
 
     # Create graph

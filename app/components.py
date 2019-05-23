@@ -7,11 +7,37 @@ import numpy as np
 from app.helpers import make_graph
 
 
-def error(msg: str):
+def error(msg: str) -> list:
+    """
+    Creates paragraph with error message.
+
+    Parameters
+    ----------
+    msg - error message
+
+    Returns
+    -------
+    A html paragraph:
+    [dash_html_components.html.P]
+    """
     return [html.P(msg, style={'color': 'red'})]
 
 
 def button(idx: str, txt: str, align: str = 'right'):
+    """
+    Creates constant-style button.
+
+    Parameters
+    ----------
+    idx - button id
+    txt - button text
+    align - css align parameter
+
+    Returns
+    -------
+    A html button:
+    dash_html_components.html.Button
+    """
     return html.Button(txt,
                        id=idx,
                        style={
@@ -22,7 +48,21 @@ def button(idx: str, txt: str, align: str = 'right'):
                        n_clicks=0)
 
 
-def graph(cities, edges):
+def graph(cities: list, edges: list):
+    """
+    Creates plotly network graph using supplied
+    cities (nodes) and edges.
+
+    Parameters
+    ----------
+    cities - list of nodes
+    edges - list of edges
+
+    Returns
+    -------
+    Rendered plotly graph:
+    dash_core_components.Graph
+    """
     return dcc.Graph(
         id='example-graph',
         figure=make_graph(cities, edges),
@@ -34,6 +74,17 @@ def graph(cities, edges):
 
 
 def upload(idx: str, name: str = 'Select Files'):
+    """
+    Reusable upload component.
+    Parameters
+    ----------
+    idx - element id
+    name - element name
+
+    Returns
+    -------
+    html div
+    """
     return html.Div([
         html.P(name),
         dcc.Upload(
@@ -58,7 +109,22 @@ def upload(idx: str, name: str = 'Select Files'):
     ])
 
 
-def stats(solve_time: float, solution, cities, input_time: int = 0, new: bool =True):
+def stats(solve_time: float, solution, cities: list, input_time: int = 0, new: bool = True):
+    """
+    Reusable component for solution statistics.
+
+    Parameters
+    ----------
+    solve_time - time of solving
+    solution - Output object
+    cities - list of Cities
+    input_time - time provided in time.csv
+    new - True if for a new solution (requires time.csv)
+
+    Returns
+    -------
+    html div
+    """
     if new:
         worked_time = input_time - solution.time_left
         time_left = solution.time_left
@@ -82,6 +148,18 @@ def stats(solve_time: float, solution, cities, input_time: int = 0, new: bool =T
 
 
 def upload_table(name: str, df: pd.DataFrame):
+    """
+    Reusable component for html table.
+
+    Parameters
+    ----------
+    name - table name
+    df - data frame with data to dispaly
+
+    Returns
+    -------
+    html div
+    """
     df = df.iloc[:20, :]
     return [html.Div([
         html.P(f'File {name} successfully uploaded!'),
@@ -96,4 +174,7 @@ def upload_table(name: str, df: pd.DataFrame):
 
 
 def vbar():
+    """
+    Simple horizontal bar.
+    """
     return html.Div(style={'height': '3px', 'background-color': '#1EAEDB'})

@@ -1,20 +1,20 @@
-import sys, getopt
-import os
 import pandas as pd
 from .city import City
-from .random_solver import convert_to_dict
+from .random_solver import convert_to_dict, Output
 
 
 def choose_the_best_path(resources, cities_list):
-    ''' Resource is a list of possible paths with an eye on possible time
-        cities list is used to hold an information if city has been visited or not
-        function returns summary - path with profits '''
-    summary ={}
+    """
+    Resource is a list of possible paths with an eye on possible time
+    cities list is used to hold an information if city has been visited or not
+    function returns summary - path with profits
+    """
+    summary = {}
     g = 0
     for j in resources:
         profit = 0
         for stepOne in j:
-            if cities_list[stepOne].visited == False:
+            if cities_list[stepOne].visited is False:
                 profit = profit + cities_list[stepOne].value
                 cities_list[stepOne].visited = True
         summary[profit] = j
@@ -30,7 +30,7 @@ def return_the_best_value(dict_temp):
     return naj
 
 
-def return_cost_of_the_best_path(graph, dict_temp_two, best):
+def return_path_time(graph, dict_temp_two, best):
     """Returns the cost on the best (from profit side) path"""
     w = 1
     cost = 0
@@ -44,18 +44,19 @@ def return_cost_of_the_best_path(graph, dict_temp_two, best):
 def create_answer_for_path_creation(dict_temp_three, best):
     """Creates special form of answer for path creation"""
     answer_plot = []
-    do = len(dict_temp_three[best]) -1
+    do = len(dict_temp_three[best]) - 1
     for x in range(do):
         answer_plot.append((dict_temp_three[best][x], dict_temp_three[best][x + 1]))
     return answer_plot
 
 
-def solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
+def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, time_limit: int = 20):
+    print('Works exact')
+
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(paths, pd.DataFrame), 'Wrong data format!'
     assert isinstance(time, pd.DataFrame), 'Wrong data format!'
 
-    
     def find_all_possible_paths(graph, start, time_left, path=[], time_used=0):
         """ Finds all paths from chosen start point with eye on possible time """
         nonlocal all_paths
@@ -73,7 +74,6 @@ def solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
                 break
         return all_paths
 
-    
     def create_all_possible_paths(graph, time_at_the_beggining):
         """ General paths creating for all possible starting points """
         list_of_paths = []
@@ -94,19 +94,23 @@ def solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame):
         # get: name, x, y, quantity
         vec = cities[cities['name'] == k].values[0]
         c = City(k, vec[1], vec[2], vec[3])
-        c.get_neighbours(d)
+        c.set_neighbours(d)
         cities_dict[k] = c
 
     cities_dict_with_values = choose_the_best_path(possible_paths, cities_dict)
 
     best_profit = return_the_best_value(cities_dict_with_values)
-    print(best_profit)
 
-    cost_of_the_best_path = return_cost_of_the_best_path(d, cities_dict_with_values, best_profit)
-    print("Wykorzystany czas - " + str(cost_of_the_best_path))
+    path_time = return_path_time(d, cities_dict_with_values, best_profit)
 
     path_answer = create_answer_for_path_creation(cities_dict_with_values, best_profit)
-    print(path_answer)
 
-    solution = [working_time - cost_of_the_best_path, best_profit, cities_dict_with_values[best_profit]]
-    return solution
+    solution = [working_time - path_time, best_profit, cities_dict_with_values[best_profit]]
+
+    print(solution)
+
+    output = Output(time_left=working_time - path_time,
+                    path=path_answer,
+                    total=best_profit)
+    print(output)
+    return output, []

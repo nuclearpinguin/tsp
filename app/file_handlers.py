@@ -9,6 +9,15 @@ Result = namedtuple('Result', ['status', 'msg'])
 
 
 def save_solution(solution: Output, time: int, new: bool = True) -> None:
+    """
+    Saves solution to .txt file.
+
+    Parameters
+    ----------
+    solution - Output with solution data
+    time - value provided in time.csv
+    new - True if solution is a new solution
+    """
     if new:
         txt = '['
         for c in solution.path:
@@ -28,6 +37,17 @@ def save_solution(solution: Output, time: int, new: bool = True) -> None:
 
 
 def validate_cities(df: pd.DataFrame) -> Result:
+    """
+    Validates cities input.
+
+    Parameters
+    ----------
+    df - data frame with cities
+
+    Returns
+    -------
+    True if file is valid, else False.
+    """
     if list(df.columns) != ['name', 'x', 'y', 'quantity']:
         return Result(False, 'Wrong columns names!')
 
@@ -57,6 +77,18 @@ def validate_cities(df: pd.DataFrame) -> Result:
 
 
 def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
+    """
+    Validates paths input.
+
+    Parameters
+    ----------
+    df - data frame with paths
+    cities - data frame with cities
+
+    Returns
+    -------
+    True if file is valid, else False.
+    """
     if list(df.columns) != ['city_from', 'city_to', 'travel_time']:
         return Result(False, 'Wrong columns names!')
 
@@ -119,6 +151,17 @@ def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
 
 
 def validate_time(df: pd.DataFrame) -> Result:
+    """
+    Validates time input.
+
+    Parameters
+    ----------
+    df - data frame with time
+
+    Returns
+    -------
+    True if file is valid, else False.
+    """
     if list(df.columns) != ['time']:
         return Result(False, 'Wrong columns names!')
 
@@ -134,11 +177,17 @@ def validate_time(df: pd.DataFrame) -> Result:
 
 
 def parse_city(txt: str) -> City:
+    """
+    Parses string to a City object.
+    """
     name, x, y, q = txt.split(',')
     return City(name, int(x), int(y), int(q))
 
 
 def parse_cities(txt: str) -> list:
+    """
+    Parses line with cities to list of Cities.
+    """
     txt = txt[2:-2]
     # In case of Windows shit \r\n
     if txt[-1] == ')':
@@ -148,17 +197,34 @@ def parse_cities(txt: str) -> list:
 
 
 def parse_solution(contents: str) -> str:
+    """
+    Simple decoder.
+    """
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     return decoded.decode('utf-8')
 
 
 def solution_to_output(content: str) -> Output:
+    """
+    Parses solution in text to Output.
+    """
     cities, total, time = parse_solution(content).split('\n')
     return Output(time, total, parse_cities(cities))
 
 
 def validate_solution(content: str) -> Result:
+    """
+    Validates solution input.
+
+    Parameters
+    ----------
+    content - raw input (bytes?)
+
+    Returns
+    -------
+    True if file is valid, else False.
+    """
     try:
         parsed = parse_solution(content)
         cities, total, time = parsed.split('\n')

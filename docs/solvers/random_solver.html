@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.2" />
+<title>app.solvers.random_solver API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>app.solvers.random_solver</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">import pandas as pd
+import random
+from collections import namedtuple
+from .city import City
+from time import time
+
+
+Output = namedtuple(&#39;Output&#39;, [&#39;time_left&#39;, &#39;total&#39;, &#39;path&#39;])
+
+
+def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -&gt; dict:
+    &#34;&#34;&#34;
+    Converts data frames of cities and paths to a dictionary
+    {city: {neighbour : time_to_neighbour}}.
+
+    :param df_cities: pandas.read_csv(&#34;cities.csv&#34;)
+    :param df_paths: pandas.read_csv(&#34;paths.csv&#34;)
+    :return: dictionary {city: {neighbour : time_to_neighbour}}
+    &#34;&#34;&#34;
+
+    dict_paths = {}
+    for city in df_cities[&#39;name&#39;]:
+        # get lists of neighbours of the city
+        neighbours_keys = list(df_paths[df_paths[&#39;city_from&#39;] == city][&#39;city_to&#39;]) + \
+                          list(df_paths[df_paths[&#39;city_to&#39;] == city][&#39;city_from&#39;])
+        # get list of times needed to travel to each of them
+        neighbours_values = list(df_paths[df_paths[&#39;city_from&#39;] == city][&#39;travel_time&#39;]) + \
+                            list(df_paths[df_paths[&#39;city_to&#39;] == city][&#39;travel_time&#39;])
+        # then merge them
+        dict_paths[city] = {key: value for key, value in zip(neighbours_keys, neighbours_values)}
+
+    return dict_paths
+
+
+def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -&gt; Output:
+    &#34;&#34;&#34; Generates a list containing: time, total and random path. &#34;&#34;&#34;
+
+    path = []
+    tmp_time = time_left
+    total = 0
+    curr_city = cities_dict[starting_city]
+
+    # reset visited property
+    for city in cities_dict.values():
+        city.visited = False
+
+    while tmp_time &gt;= 0:
+        time_left = tmp_time
+
+        if curr_city not in path:
+            # city&#39;s quantity is added only once
+            total += curr_city.value
+
+        # add city to a path
+        path.append(curr_city)
+        curr_city.visited = True
+
+        # select random neighbour
+        nghbrs = list(curr_city.neighbours.keys())
+        if not nghbrs:
+            break
+
+        next_city = random.choice(list(curr_city.neighbours.keys()))
+
+        # if the city was visited - draw again
+        if cities_dict[next_city].visited:
+            next_city = random.choice(list(curr_city.neighbours.keys()))
+            # and maybe again
+            if cities_dict[next_city].visited:
+                next_city = random.choice(list(curr_city.neighbours.keys()))
+                # three times lucky
+                if cities_dict[next_city].visited:
+                    next_city = random.choice(list(curr_city.neighbours.keys()))
+
+        # subtract the travel time from available time
+        tmp_time -= curr_city.neighbours[next_city]
+
+        # if for the drawn neighbour path was too expensive,
+        # check other neighbours
+        if tmp_time &lt; 0:
+            for ngbr in curr_city.neighbours.keys():
+                # restore last time that was &gt; 0
+                tmp = tmp_time + curr_city.neighbours[next_city]
+
+                # calculate time left after travel to ngbr
+                tmp -= curr_city.neighbours[ngbr]
+                # if &#34;affordable&#34; neighbour was found
+                if tmp &gt; 0:
+                    # print(f&#34;Better neighbour from {curr_city.name} found: {ngbr} instead of {next_city}&#34;)
+                    tmp_time = tmp
+                    next_city = ngbr
+                    break
+
+        # set city we travelled to as a current city
+        curr_city = cities_dict[next_city]
+
+    return Output(time_left, total, path)
+
+
+def find_best_of_random_paths(cities_dict: dict,
+                              working_time: int,
+                              n: int,
+                              time_limit: int) -&gt; Output:
+    &#34;&#34;&#34;
+    Returns list [time_left, sum, path] for the best of paths found in random walk.
+    :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    :param working_time: limits the duration of single path
+    :param n: number of trials for each vertex in random walk
+    :param time_limit: max number of seconds the algorithm can work
+    &#34;&#34;&#34;
+
+    start_time = time()
+
+    best_paths = []
+    for starting_city in cities_dict.keys():
+        lst = []
+
+        # for better performance define
+        add = lst.append
+        for i in range(n):
+            add(find_random_path(cities_dict, starting_city, working_time))
+
+        # sort list [time_left, total, path] by total, descending
+        lst.sort(key=lambda x: x[1], reverse=True)
+        best_paths.append(lst[0])
+
+        # if finding the best path took 50s as far,
+        # break the loop and select the best of paths found as far
+        if time() - start_time &gt; time_limit:
+            print(&#34;Time limit exceeded.&#34;)
+            break
+
+    best_paths.sort(key=lambda x: x[1], reverse=True)
+
+    return best_paths[0]
+
+
+def convert_to_edges_list(paths: list):
+    path = [(cf.name, ct.name)
+            for cf, ct in zip(paths[:-1], paths[1:])]
+    return path
+
+
+# solver
+def solve(cities: pd.DataFrame,
+          edges: pd.DataFrame,
+          info: pd.DataFrame,
+          n_simulation: int = 50,
+          time_limit: int = 20):
+    assert isinstance(cities, pd.DataFrame), &#39;Wrong data format!&#39;
+    assert isinstance(edges, pd.DataFrame), &#39;Wrong data format!&#39;
+    assert isinstance(info, pd.DataFrame), &#39;Wrong data format!&#39;
+
+    # build a dictionary {city : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    d = convert_to_dict(cities, edges)
+
+    # build a dict {city_name : City object}
+    cities_dict = {}
+
+    for k in d.keys():
+        # get: name, x, y, quantity
+        vec = cities[cities[&#39;name&#39;] == k].values[0]
+        c = City(k, vec[1], vec[2], vec[3])
+        c.set_neighbours(d)
+        cities_dict[k] = c
+
+    # get working time from the data frame
+    working_time = info[&#39;time&#39;].values[0]
+
+    # compute the best path
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
+
+    return solution, convert_to_edges_list(solution.path)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="app.solvers.random_solver.convert_to_dict"><code class="name flex">
+<span>def <span class="ident">convert_to_dict</span></span>(<span>df_cities, df_paths)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Converts data frames of cities and paths to a dictionary
+{city: {neighbour : time_to_neighbour}}.</p>
+<p>:param df_cities: pandas.read_csv("cities.csv")
+:param df_paths: pandas.read_csv("paths.csv")
+:return: dictionary {city: {neighbour : time_to_neighbour}}</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -&gt; dict:
+    &#34;&#34;&#34;
+    Converts data frames of cities and paths to a dictionary
+    {city: {neighbour : time_to_neighbour}}.
+
+    :param df_cities: pandas.read_csv(&#34;cities.csv&#34;)
+    :param df_paths: pandas.read_csv(&#34;paths.csv&#34;)
+    :return: dictionary {city: {neighbour : time_to_neighbour}}
+    &#34;&#34;&#34;
+
+    dict_paths = {}
+    for city in df_cities[&#39;name&#39;]:
+        # get lists of neighbours of the city
+        neighbours_keys = list(df_paths[df_paths[&#39;city_from&#39;] == city][&#39;city_to&#39;]) + \
+                          list(df_paths[df_paths[&#39;city_to&#39;] == city][&#39;city_from&#39;])
+        # get list of times needed to travel to each of them
+        neighbours_values = list(df_paths[df_paths[&#39;city_from&#39;] == city][&#39;travel_time&#39;]) + \
+                            list(df_paths[df_paths[&#39;city_to&#39;] == city][&#39;travel_time&#39;])
+        # then merge them
+        dict_paths[city] = {key: value for key, value in zip(neighbours_keys, neighbours_values)}
+
+    return dict_paths</code></pre>
+</details>
+</dd>
+<dt id="app.solvers.random_solver.convert_to_edges_list"><code class="name flex">
+<span>def <span class="ident">convert_to_edges_list</span></span>(<span>paths)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def convert_to_edges_list(paths: list):
+    path = [(cf.name, ct.name)
+            for cf, ct in zip(paths[:-1], paths[1:])]
+    return path</code></pre>
+</details>
+</dd>
+<dt id="app.solvers.random_solver.find_best_of_random_paths"><code class="name flex">
+<span>def <span class="ident">find_best_of_random_paths</span></span>(<span>cities_dict, working_time, n, time_limit)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns list [time_left, sum, path] for the best of paths found in random walk.
+:param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+:param working_time: limits the duration of single path
+:param n: number of trials for each vertex in random walk
+:param time_limit: max number of seconds the algorithm can work</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def find_best_of_random_paths(cities_dict: dict,
+                              working_time: int,
+                              n: int,
+                              time_limit: int) -&gt; Output:
+    &#34;&#34;&#34;
+    Returns list [time_left, sum, path] for the best of paths found in random walk.
+    :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    :param working_time: limits the duration of single path
+    :param n: number of trials for each vertex in random walk
+    :param time_limit: max number of seconds the algorithm can work
+    &#34;&#34;&#34;
+
+    start_time = time()
+
+    best_paths = []
+    for starting_city in cities_dict.keys():
+        lst = []
+
+        # for better performance define
+        add = lst.append
+        for i in range(n):
+            add(find_random_path(cities_dict, starting_city, working_time))
+
+        # sort list [time_left, total, path] by total, descending
+        lst.sort(key=lambda x: x[1], reverse=True)
+        best_paths.append(lst[0])
+
+        # if finding the best path took 50s as far,
+        # break the loop and select the best of paths found as far
+        if time() - start_time &gt; time_limit:
+            print(&#34;Time limit exceeded.&#34;)
+            break
+
+    best_paths.sort(key=lambda x: x[1], reverse=True)
+
+    return best_paths[0]</code></pre>
+</details>
+</dd>
+<dt id="app.solvers.random_solver.find_random_path"><code class="name flex">
+<span>def <span class="ident">find_random_path</span></span>(<span>cities_dict, starting_city, time_left)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Generates a list containing: time, total and random path.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -&gt; Output:
+    &#34;&#34;&#34; Generates a list containing: time, total and random path. &#34;&#34;&#34;
+
+    path = []
+    tmp_time = time_left
+    total = 0
+    curr_city = cities_dict[starting_city]
+
+    # reset visited property
+    for city in cities_dict.values():
+        city.visited = False
+
+    while tmp_time &gt;= 0:
+        time_left = tmp_time
+
+        if curr_city not in path:
+            # city&#39;s quantity is added only once
+            total += curr_city.value
+
+        # add city to a path
+        path.append(curr_city)
+        curr_city.visited = True
+
+        # select random neighbour
+        nghbrs = list(curr_city.neighbours.keys())
+        if not nghbrs:
+            break
+
+        next_city = random.choice(list(curr_city.neighbours.keys()))
+
+        # if the city was visited - draw again
+        if cities_dict[next_city].visited:
+            next_city = random.choice(list(curr_city.neighbours.keys()))
+            # and maybe again
+            if cities_dict[next_city].visited:
+                next_city = random.choice(list(curr_city.neighbours.keys()))
+                # three times lucky
+                if cities_dict[next_city].visited:
+                    next_city = random.choice(list(curr_city.neighbours.keys()))
+
+        # subtract the travel time from available time
+        tmp_time -= curr_city.neighbours[next_city]
+
+        # if for the drawn neighbour path was too expensive,
+        # check other neighbours
+        if tmp_time &lt; 0:
+            for ngbr in curr_city.neighbours.keys():
+                # restore last time that was &gt; 0
+                tmp = tmp_time + curr_city.neighbours[next_city]
+
+                # calculate time left after travel to ngbr
+                tmp -= curr_city.neighbours[ngbr]
+                # if &#34;affordable&#34; neighbour was found
+                if tmp &gt; 0:
+                    # print(f&#34;Better neighbour from {curr_city.name} found: {ngbr} instead of {next_city}&#34;)
+                    tmp_time = tmp
+                    next_city = ngbr
+                    break
+
+        # set city we travelled to as a current city
+        curr_city = cities_dict[next_city]
+
+    return Output(time_left, total, path)</code></pre>
+</details>
+</dd>
+<dt id="app.solvers.random_solver.solve"><code class="name flex">
+<span>def <span class="ident">solve</span></span>(<span>cities, edges, info, n_simulation=50, time_limit=20)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def solve(cities: pd.DataFrame,
+          edges: pd.DataFrame,
+          info: pd.DataFrame,
+          n_simulation: int = 50,
+          time_limit: int = 20):
+    assert isinstance(cities, pd.DataFrame), &#39;Wrong data format!&#39;
+    assert isinstance(edges, pd.DataFrame), &#39;Wrong data format!&#39;
+    assert isinstance(info, pd.DataFrame), &#39;Wrong data format!&#39;
+
+    # build a dictionary {city : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    d = convert_to_dict(cities, edges)
+
+    # build a dict {city_name : City object}
+    cities_dict = {}
+
+    for k in d.keys():
+        # get: name, x, y, quantity
+        vec = cities[cities[&#39;name&#39;] == k].values[0]
+        c = City(k, vec[1], vec[2], vec[3])
+        c.set_neighbours(d)
+        cities_dict[k] = c
+
+    # get working time from the data frame
+    working_time = info[&#39;time&#39;].values[0]
+
+    # compute the best path
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
+
+    return solution, convert_to_edges_list(solution.path)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="app.solvers.random_solver.Output"><code class="flex name class">
+<span>class <span class="ident">Output</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Output(time_left, total, path)</p></section>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="app.solvers.random_solver.Output.path"><code class="name">var <span class="ident">path</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+</dd>
+<dt id="app.solvers.random_solver.Output.time_left"><code class="name">var <span class="ident">time_left</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+</dd>
+<dt id="app.solvers.random_solver.Output.total"><code class="name">var <span class="ident">total</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="app.solvers" href="index.html">app.solvers</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="app.solvers.random_solver.convert_to_dict" href="#app.solvers.random_solver.convert_to_dict">convert_to_dict</a></code></li>
+<li><code><a title="app.solvers.random_solver.convert_to_edges_list" href="#app.solvers.random_solver.convert_to_edges_list">convert_to_edges_list</a></code></li>
+<li><code><a title="app.solvers.random_solver.find_best_of_random_paths" href="#app.solvers.random_solver.find_best_of_random_paths">find_best_of_random_paths</a></code></li>
+<li><code><a title="app.solvers.random_solver.find_random_path" href="#app.solvers.random_solver.find_random_path">find_random_path</a></code></li>
+<li><code><a title="app.solvers.random_solver.solve" href="#app.solvers.random_solver.solve">solve</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="app.solvers.random_solver.Output" href="#app.solvers.random_solver.Output">Output</a></code></h4>
+<ul class="">
+<li><code><a title="app.solvers.random_solver.Output.path" href="#app.solvers.random_solver.Output.path">path</a></code></li>
+<li><code><a title="app.solvers.random_solver.Output.time_left" href="#app.solvers.random_solver.Output.time_left">time_left</a></code></li>
+<li><code><a title="app.solvers.random_solver.Output.total" href="#app.solvers.random_solver.Output.total">total</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.2</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

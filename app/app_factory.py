@@ -21,7 +21,7 @@ CLICKS = 0
 
 def create_app():
     """
-    Dash app factory and layout definition
+    Dash app factory and layout definition.
     """
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets, sharing=True)
     app.config['suppress_callback_exceptions'] = True
@@ -55,13 +55,13 @@ def create_app():
                         style={'width': '33%', 'vertical-align': 'top'}),
                 ]),
             ], style={'width': '100%', 'height': '100px'}),
-            # daq.BooleanSwitch(
-            #     id='exact-solver',
-            #     on=False,
-            #     label='Use exact solver',
-            #     labelPosition='top',
-            #     style={'margin-right': '20px', 'display': 'inline-block'}
-            # ),
+            daq.BooleanSwitch(
+                id='exact-solver',
+                on=False,
+                label='Use exact solver',
+                labelPosition='top',
+                style={'margin-right': '20px', 'display': 'inline-block'}
+            ),
             daq.BooleanSwitch(
                 id='plot-switch',
                 on=True,
@@ -146,6 +146,7 @@ def create_app():
 
     @app.callback([Output('tsp-solution', 'children'), Output('memory', 'data')],
                   [Input('type-switch', 'on'),
+                   Input('exact-solver', 'on'),
                    Input('solve-btn', 'n_clicks'),
                    Input('city-input', 'contents'),
                    Input('paths-input', 'contents'),
@@ -154,7 +155,7 @@ def create_app():
                    Input('time-slider', 'value')
                    ],
                   [State('memory', 'data')])
-    def generate_solution(old_solution, n_clicks, city, paths, df_time, n_sim, time_limit, cache):
+    def generate_solution(old_solution, exact, n_clicks, city, paths, df_time, n_sim, time_limit, cache):
         global CLICKS
         if old_solution and n_clicks and n_clicks > CLICKS:
             solution_content = df_time
@@ -193,7 +194,8 @@ def create_app():
                                                      paths=parse_contents(paths),
                                                      time=df_time,
                                                      simulations=n_sim,
-                                                     time_limit=time_limit)
+                                                     time_limit=time_limit,
+                                                     exact=exact)
             solving_time = time.time() - tic
 
             # Save solution
