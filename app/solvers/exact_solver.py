@@ -6,8 +6,16 @@ from .random_solver import convert_to_dict, Output
 def choose_the_best_path(resources, cities_list):
     """
     Resource is a list of possible paths with an eye on possible time
-    cities list is used to hold an information if city has been visited or not
-    function returns summary - path with profits
+        cities list is used to hold an information if city has been visited or not
+        function returns summary - path with profits 
+    Parameters
+    ----------
+    resources
+    cities_list
+
+    Returns
+    -------
+
     """
     summary = {}
     g = 0
@@ -25,13 +33,33 @@ def choose_the_best_path(resources, cities_list):
 
 
 def return_the_best_value(dict_temp):
-    """Returns the best profit from dictionary which consist of paths with profits."""
+    """
+    Returns the best profit from dictionary which consist of paths with profits.
+    Parameters
+    ----------
+    dict_temp
+
+    Returns
+    -------
+
+    """
     naj = max(dict_temp.keys())
     return naj
 
 
 def return_path_time(graph, dict_temp_two, best):
-    """Returns the cost on the best (from profit side) path"""
+    """
+    Returns the cost on the best (from profit side) path
+    Parameters
+    ----------
+    graph
+    dict_temp_two
+    best
+
+    Returns
+    -------
+
+    """
     w = 1
     cost = 0
     do = len(dict_temp_two[best]) - 1
@@ -42,7 +70,17 @@ def return_path_time(graph, dict_temp_two, best):
 
 
 def create_answer_for_path_creation(dict_temp_three, best):
-    """Creates special form of answer for path creation"""
+    """
+    Creates special form of answer for path creation
+    Parameters
+    ----------
+    dict_temp_three
+    best
+
+    Returns
+    -------
+
+    """
     answer_plot = []
     do = len(dict_temp_three[best]) - 1
     for x in range(do):
@@ -51,6 +89,18 @@ def create_answer_for_path_creation(dict_temp_three, best):
 
 
 def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, time_limit: int = 20):
+    """
+
+    Parameters
+    ----------
+    cities
+    paths
+    time
+
+    Returns
+    -------
+
+    """
     print('Works exact')
 
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
@@ -58,7 +108,20 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
     assert isinstance(time, pd.DataFrame), 'Wrong data format!'
 
     def find_all_possible_paths(graph, start, time_left, path=[], time_used=0):
-        """ Finds all paths from chosen start point with eye on possible time """
+        """
+
+        Parameters
+        ----------
+        graph
+        start
+        time_left
+        path
+        time_used
+
+        Returns
+        -------
+
+        """
         nonlocal all_paths
         time_left = time_left - time_used
         path = path + [start]
@@ -75,7 +138,17 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         return all_paths
 
     def create_all_possible_paths(graph, time_at_the_beggining):
-        """ General paths creating for all possible starting points """
+        """
+
+        Parameters
+        ----------
+        graph
+        time_at_the_beggining
+
+        Returns
+        -------
+
+        """
         list_of_paths = []
         for x in graph.keys():
             # all_paths = []
