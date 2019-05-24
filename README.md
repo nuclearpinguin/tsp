@@ -1,5 +1,5 @@
-# tsp
-Uni project solving tsp
+## TSP
+Uni project solving tsp-like problem.
 
 To run app just do:
 
@@ -8,3 +8,7 @@ To run app just do:
 To use gunicorn one can do:
 
 `gunicorn --workers=2 --bind=0.0.0.0 gapp:app`
+
+## DOCS
+
+https://nuclearpinguin.github.io/tsp/
