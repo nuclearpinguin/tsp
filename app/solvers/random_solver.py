@@ -10,15 +10,16 @@ Output = namedtuple('Output', ['time_left', 'total', 'path'])
 
 def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     """
-    Converts data frames of cities and paths to a dictionary {city: {neighbour : time_to_neighbour}}.
+    Converts data frames of cities and paths to a dictionary.
 
     Parameters
     ----------
     df_cities - pandas.read_csv("cities.csv")
     df_paths - pandas.read_csv("paths.csv")
 
-    Returns dictionary containing {city: {neighbour : time_to_neighbour}}
+    Returns
     -------
+    A dictionary containing {city: {neighbour : time_to_neighbour}}.
     """
 
     dict_paths = {}
@@ -41,12 +42,14 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
 
     Parameters
     ----------
-    cities_dict - dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    cities_dict - dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}},
+                  obtained from convert_to_dict function
     starting_city - City object, from which the path starts
-    time_left - amount of hours until salesman can travel no more
+    time_left - number of hours until salesman can travel no more
 
-    Returns a tuple containing: time, total and random path.
+    Returns
     -------
+    A tuple (Output) containing: time, total and path.
     """
 
     path=[]
@@ -116,7 +119,8 @@ def find_best_of_random_paths(cities_dict: dict,
                               n: int,
                               time_limit: int) -> Output:
     """
-
+    Runs find_random_path starting from each city, and returns the best
+    (in view of profit) of found paths.
 
     Parameters
     ----------
@@ -125,8 +129,9 @@ def find_best_of_random_paths(cities_dict: dict,
     n - number of trials for each vertex in random walk
     time_limit - max number of seconds the algorithm can work
 
-    Returns list [time_left, sum, path] for the best of paths found in random walk.
+    Returns
     -------
+    A tuple (Output) containing: time_left, total and path of the best of random paths.
     """
 
     start_time = time()
@@ -163,9 +168,9 @@ def convert_to_edges_list(paths: list) -> list:
     ----------
     paths - list of City objects
 
-    Returns list of city names in order of visits.
+    Returns
     -------
-
+    A list of pairs (city_from, city_to).
     """
     path = [(cf.name, ct.name)
             for cf, ct in zip(paths[:-1], paths[1:])]
@@ -178,6 +183,21 @@ def solve(cities: pd.DataFrame,
           info: pd.DataFrame,
           n_simulation: int = 50,
           time_limit: int = 20):
+    """
+
+    Parameters
+    ----------
+    cities - data frame containing: name, x, y, quantity
+    edges - data frame containing: city_from, city_to, travel_time
+    info - silly data frame containing: time
+    n_simulation - number of random walks simulations from each city
+    time_limit - number of seconds until calculation is interrupted,
+                 and the best solution found as far is returned
+
+    Returns
+    -------
+    A tuple: Output and list containing pairs (city_from, city_to).
+    """
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
     assert isinstance(info, pd.DataFrame), 'Wrong data format!'
