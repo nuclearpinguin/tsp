@@ -41,7 +41,6 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
 def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> Output:
     """
     Generates a list containing: time, total and random path.
-    """
 
     Parameters
     ----------
