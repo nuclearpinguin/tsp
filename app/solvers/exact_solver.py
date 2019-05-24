@@ -138,7 +138,7 @@ def exact_solve(cities: pd.DataFrame,
             return []
         # all_paths = []
         for node in graph[start].keys():
-            if time_left - graph[start][node] >= 0:
+            if time_left - graph[start][node] >= 0 and path.count(node)<4:
                 find_all_possible_paths(graph, node, time_left, path, graph[start][node])
             elif path not in all_paths:
                 all_paths.append(path)
