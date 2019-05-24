@@ -1,8 +1,10 @@
 import pandas as pd
 import random
+from typing import Tuple, List
 from collections import namedtuple
-from .city import City
 from time import time
+
+from .city import City
 
 
 Output = namedtuple('Output', ['time_left', 'total', 'path'])
@@ -13,9 +15,14 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     Converts data frames of cities and paths to a dictionary
     {city: {neighbour : time_to_neighbour}}.
 
-    :param df_cities: pandas.read_csv("cities.csv")
-    :param df_paths: pandas.read_csv("paths.csv")
-    :return: dictionary {city: {neighbour : time_to_neighbour}}
+    Parameters
+    ----------
+    df_cities - validated data frame with cities
+    df_paths - validated data frame with paths
+
+    Returns
+    -------
+    Dictionary {city: {neighbour : time_to_neighbour}}
     """
 
     dict_paths = {}
@@ -33,7 +40,9 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
 
 
 def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> Output:
-    """ Generates a list containing: time, total and random path. """
+    """
+    Generates a list containing: time, total and random path.
+    """
 
     path = []
     tmp_time = time_left
@@ -135,7 +144,10 @@ def find_best_of_random_paths(cities_dict: dict,
     return best_paths[0]
 
 
-def convert_to_edges_list(paths: list):
+def convert_to_edges_list(paths: List[City]) -> List[tuple]:
+    """
+    Returns edges between cities.
+    """
     path = [(cf.name, ct.name)
             for cf, ct in zip(paths[:-1], paths[1:])]
     return path
@@ -144,12 +156,28 @@ def convert_to_edges_list(paths: list):
 # solver
 def solve(cities: pd.DataFrame,
           edges: pd.DataFrame,
-          info: pd.DataFrame,
+          df_time: pd.DataFrame,
           n_simulation: int = 50,
-          time_limit: int = 20):
+          time_limit: int = 20) -> Tuple[Output, list]:
+    """
+    Solver using random walk.
+
+    Parameters
+    ----------
+    cities - validated data frame with cities / nodes
+    edges - validated data frame with edges / paths
+    df_time - validated data frame with time
+    n_simulation - number of simulations per nodes
+    time_limit - maximum time of arunning the algorithm (in seconds)
+
+    Returns
+    -------
+    Solution and list of selected edges.
+    Tuple[Output, list]
+    """
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
-    assert isinstance(info, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(df_time, pd.DataFrame), 'Wrong data format!'
 
     # build a dictionary {city : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
     d = convert_to_dict(cities, edges)
@@ -165,7 +193,7 @@ def solve(cities: pd.DataFrame,
         cities_dict[k] = c
 
     # get working time from the data frame
-    working_time = info['time'].values[0]
+    working_time = df_time['time'].values[0]
 
     # compute the best path
     solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)

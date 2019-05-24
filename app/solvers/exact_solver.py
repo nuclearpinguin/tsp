@@ -5,7 +5,8 @@ from .random_solver import convert_to_dict, Output
 
 def choose_the_best_path(resources, cities_list):
     """
-         
+    Selects best path.
+
     Parameters
     ----------
     resources - list of all possible paths [[path_1], [path_2], [path_3], ...]
@@ -30,12 +31,13 @@ def choose_the_best_path(resources, cities_list):
     return summary
 
 
-def return_the_best_value(dict_temp):
+def return_the_best_value(dict_temp: dict) -> int:
     """
     Returns the best profit from dictionary which consist of paths with profits.
+
     Parameters
     ----------
-    dict_temp - dictionary - values with paths {'value_1' : [path_i], 'value_2' : [path_y],...}
+    dict_temp - dictionary representing paths {'value_1' : [path_i], 'value_2' : [path_y],...}
 
     Returns 
     -------
@@ -47,10 +49,11 @@ def return_the_best_value(dict_temp):
 
 def return_path_time(graph, dict_temp_two, best):
     """
-    Returns the cost on the best (from profit side) path
+    Returns the cost on the best (from profit side) path.
+
     Parameters
     ----------
-    graph
+    graph - ?
     dict_temp_two - dictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
     best - the best possible value - value_y
 
@@ -69,7 +72,8 @@ def return_path_time(graph, dict_temp_two, best):
 
 def create_answer_for_path_creation(dict_temp_three, best):
     """
-    Creates special form of answer for path creation
+    Creates special form of answer for path creation.
+
     Parameters
     ----------
     dict_temp_three - ictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
@@ -86,28 +90,35 @@ def create_answer_for_path_creation(dict_temp_three, best):
     return answer_plot
 
 
-def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, time_limit: int = 20):
+def exact_solve(cities: pd.DataFrame,
+                paths: pd.DataFrame,
+                df_time: pd.DataFrame,
+                time_limit: int = 20):
     """
+    Solver using random walk.
 
     Parameters
     ----------
-    cities - framework with possible cities 
-    paths - framework with possible paths 
-    time - framework with possible time
+    cities - validated data frame with cities / nodes
+    edges - validated data frame with edges / paths
+    df_time - validated data frame with time
+    n_simulation - number of simulations per nodes
+    time_limit - maximum time of arunning the algorithm (in seconds)
 
     Returns
     -------
-    Solution
+    Solution and list of selected edges.
+    Tuple[Output, list]
     """
     print('Works exact')
 
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(paths, pd.DataFrame), 'Wrong data format!'
-    assert isinstance(time, pd.DataFrame), 'Wrong data format!'
+    assert isinstance(df_time, pd.DataFrame), 'Wrong data format!'
 
     def find_all_possible_paths(graph, start, time_left, path=[], time_used=0):
         """
-
+        Finds possible path in graph starting at start node.
         Parameters
         ----------
         graph
@@ -137,6 +148,7 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 
     def create_all_possible_paths(graph, time_at_the_beggining):
         """
+        Finds all possible paths in graph.
 
         Parameters
         ----------
@@ -149,12 +161,10 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         """
         list_of_paths = []
         for x in graph.keys():
-            # all_paths = []
             list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
-            #print(x)
         return list_of_paths
 
-    working_time = time['time'].values[0]
+    working_time = df_time['time'].values[0]
 
     d = convert_to_dict(cities, paths)
 
@@ -176,10 +186,6 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 
     path_answer = create_answer_for_path_creation(cities_dict_with_values, best_profit)
 
-    solution = [working_time - path_time, best_profit, cities_dict_with_values[best_profit]]
-
-    #print(solution)
-    
     # set a list composed of City objects, for historical reasons
     result_path = []
     for item in path_answer:
@@ -188,5 +194,5 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
     output = Output(time_left=working_time - path_time,
                     path=result_path,
                     total=best_profit)
-    #print(output)
+
     return output, path_answer
