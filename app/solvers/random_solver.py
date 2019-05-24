@@ -127,16 +127,22 @@ def find_best_of_random_paths(cities_dict: dict,
         # for better performance define
         add = lst.append
         for i in range(n):
-            add(find_random_path(cities_dict, starting_city, working_time))
+            if time() - start_time > time_limit:
+                break
+            else:
+                add(find_random_path(cities_dict, starting_city, working_time))
 
         # sort list [time_left, total, path] by total, descending
         lst.sort(key=lambda x: x[1], reverse=True)
+
+        if not lst:
+            return Output(path=[], total=0, time_left=working_time)
+
         best_paths.append(lst[0])
 
         # if finding the best path took 50s as far,
         # break the loop and select the best of paths found as far
         if time() - start_time > time_limit:
-            print("Time limit exceeded.")
             break
 
     best_paths.sort(key=lambda x: x[1], reverse=True)
