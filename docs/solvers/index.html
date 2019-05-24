@@ -42,12 +42,12 @@ def make_plot_data(cities: pd.DataFrame,
 
     Parameters
     ----------
-    cities - validated data frame with cities
-    paths - validated data frame with paths
-    time - validated data frame with time
-    simulations - number of simulations (only for random_solver)
-    time_limit - time limit for solving (in seconds)
-    exact - if True then exact_solver is being used
+    cities: validated data frame with cities
+    paths: validated data frame with paths
+    time: validated data frame with time
+    simulations: number of simulations (only for random_solver)
+    time_limit: time limit for solving (in seconds)
+    exact: if True then exact_solver is being used
 
     Returns
     -------
@@ -81,9 +81,9 @@ def data_from_solution(cities: Union[pd.DataFrame, None],
 
     Parameters
     ----------
-    cities - validated data frame with cities
-    paths - validated data frame with paths
-    solution - Output representing a solution
+    cities: validated data frame with cities
+    paths: validated data frame with paths
+    solution: Output representing a solution
 
     Returns
     -------
@@ -139,9 +139,14 @@ def data_from_solution(cities: Union[pd.DataFrame, None],
 <section class="desc"><p>Utilises provided solution and additional info for recreating
 data for app.helpers.make_graph.</p>
 <h2 id="parameters">Parameters</h2>
-<p>cities - validated data frame with cities
-paths - validated data frame with paths
-solution - Output representing a solution</p>
+<dl>
+<dt><strong><code>cities</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>cities</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>paths</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>paths</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>solution</code></strong> :&ensp;<code>Output</code> <code>representing</code> <code>a</code> <code>solution</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>Tuple</code>[<code>list</code>, <code>list</code>]</dt>
@@ -158,9 +163,9 @@ solution - Output representing a solution</p>
 
     Parameters
     ----------
-    cities - validated data frame with cities
-    paths - validated data frame with paths
-    solution - Output representing a solution
+    cities: validated data frame with cities
+    paths: validated data frame with paths
+    solution: Output representing a solution
 
     Returns
     -------
@@ -194,12 +199,20 @@ solution - Output representing a solution</p>
 <section class="desc"><p>Given an input, creates new solution and returns
 data in format required by app.helpers.make_graph.</p>
 <h2 id="parameters">Parameters</h2>
-<p>cities - validated data frame with cities
-paths - validated data frame with paths
-time - validated data frame with time
-simulations - number of simulations (only for random_solver)
-time_limit - time limit for solving (in seconds)
-exact - if True then exact_solver is being used</p>
+<dl>
+<dt><strong><code>cities</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>cities</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>paths</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>paths</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>time</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>time</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>simulations</code></strong> :&ensp;<code>number</code> of <code>simulations</code> (<code>only</code> <code>for</code> <a title="app.solvers.random_solver" href="random_solver.html"><code>app.solvers.random_solver</code></a>)</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>time_limit</code></strong> :&ensp;<code>time</code> <code>limit</code> <code>for</code> <code>solving</code> (<code>in</code> <code>seconds</code>)</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>exact</code></strong> :&ensp;<code>if</code> <code>True</code> <code>then</code> <a title="app.solvers.exact_solver" href="exact_solver.html"><code>app.solvers.exact_solver</code></a> <code>is</code> <code>being</code> <code>used</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>Tuple</code>[<code>Output</code>, <code>list</code>, <code>list</code>]</dt>
@@ -219,12 +232,12 @@ exact - if True then exact_solver is being used</p>
 
     Parameters
     ----------
-    cities - validated data frame with cities
-    paths - validated data frame with paths
-    time - validated data frame with time
-    simulations - number of simulations (only for random_solver)
-    time_limit - time limit for solving (in seconds)
-    exact - if True then exact_solver is being used
+    cities: validated data frame with cities
+    paths: validated data frame with paths
+    time: validated data frame with time
+    simulations: number of simulations (only for random_solver)
+    time_limit: time limit for solving (in seconds)
+    exact: if True then exact_solver is being used
 
     Returns
     -------

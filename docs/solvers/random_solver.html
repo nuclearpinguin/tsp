@@ -41,8 +41,8 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -&gt; dict:
 
     Parameters
     ----------
-    df_cities - validated data frame with cities
-    df_paths - validated data frame with paths
+    df_cities: validated data frame with cities
+    df_paths: validated data frame with paths
 
     Returns
     -------
@@ -136,10 +136,17 @@ def find_best_of_random_paths(cities_dict: dict,
                               time_limit: int) -&gt; Output:
     &#34;&#34;&#34;
     Returns list [time_left, sum, path] for the best of paths found in random walk.
-    :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
-    :param working_time: limits the duration of single path
-    :param n: number of trials for each vertex in random walk
-    :param time_limit: max number of seconds the algorithm can work
+
+    Parameters
+    ----------
+    cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    working_time: limits the duration of single path
+    n: number of trials for each vertex in random walk
+    time_limit: max number of seconds the algorithm can work
+
+    Returns
+    -------
+    Output
     &#34;&#34;&#34;
 
     start_time = time()
@@ -151,16 +158,22 @@ def find_best_of_random_paths(cities_dict: dict,
         # for better performance define
         add = lst.append
         for i in range(n):
-            add(find_random_path(cities_dict, starting_city, working_time))
+            if time() - start_time &gt; time_limit:
+                break
+            else:
+                add(find_random_path(cities_dict, starting_city, working_time))
 
         # sort list [time_left, total, path] by total, descending
         lst.sort(key=lambda x: x[1], reverse=True)
+
+        if not lst:
+            return Output(path=[], total=0, time_left=working_time)
+
         best_paths.append(lst[0])
 
         # if finding the best path took 50s as far,
         # break the loop and select the best of paths found as far
         if time() - start_time &gt; time_limit:
-            print(&#34;Time limit exceeded.&#34;)
             break
 
     best_paths.sort(key=lambda x: x[1], reverse=True)
@@ -188,11 +201,11 @@ def solve(cities: pd.DataFrame,
 
     Parameters
     ----------
-    cities - validated data frame with cities / nodes
-    edges - validated data frame with edges / paths
-    df_time - validated data frame with time
-    n_simulation - number of simulations per nodes
-    time_limit - maximum time of arunning the algorithm (in seconds)
+    cities: validated data frame with cities / nodes
+    edges: validated data frame with edges / paths
+    df_time: validated data frame with time
+    n_simulation: number of simulations per nodes
+    time_limit: maximum time of arunning the algorithm (in seconds)
 
     Returns
     -------
@@ -239,8 +252,12 @@ def solve(cities: pd.DataFrame,
 <section class="desc"><p>Converts data frames of cities and paths to a dictionary
 {city: {neighbour : time_to_neighbour}}.</p>
 <h2 id="parameters">Parameters</h2>
-<p>df_cities - validated data frame with cities
-df_paths - validated data frame with paths</p>
+<dl>
+<dt><strong><code>df_cities</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>cities</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>df_paths</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>paths</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>Dictionary</code> {<code>city</code>: {<code>neighbour</code> : <code>time_to_neighbour</code>}}</dt>
@@ -255,8 +272,8 @@ df_paths - validated data frame with paths</p>
 
     Parameters
     ----------
-    df_cities - validated data frame with cities
-    df_paths - validated data frame with paths
+    df_cities: validated data frame with cities
+    df_paths: validated data frame with paths
 
     Returns
     -------
@@ -297,11 +314,23 @@ df_paths - validated data frame with paths</p>
 <span>def <span class="ident">find_best_of_random_paths</span></span>(<span>cities_dict, working_time, n, time_limit)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns list [time_left, sum, path] for the best of paths found in random walk.
-:param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
-:param working_time: limits the duration of single path
-:param n: number of trials for each vertex in random walk
-:param time_limit: max number of seconds the algorithm can work</p></section>
+<section class="desc"><p>Returns list [time_left, sum, path] for the best of paths found in random walk.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>cities_dict</code></strong> :&ensp;<code>dictionary</code> {<code>name</code> : {<code>neighbour1</code> : <code>travel_time1</code>, <code>neighbour2</code> : <code>travel_time2</code>}}</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>working_time</code></strong> :&ensp;<code>limits</code> <code>the</code> <code>duration</code> of <code>single</code> <code>path</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>number</code> of <code>trials</code> <code>for</code> <code>each</code> <code>vertex</code> <code>in</code> <code>random</code> <code>walk</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>time_limit</code></strong> :&ensp;<code>max</code> <code>number</code> of <code>seconds</code> <code>the</code> <code>algorithm</code> <code>can</code> <code>work</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><a title="app.solvers.random_solver.Output" href="#app.solvers.random_solver.Output"><code>Output</code></a></dt>
+<dd>&nbsp;</dd>
+</dl></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def find_best_of_random_paths(cities_dict: dict,
@@ -310,10 +339,17 @@ df_paths - validated data frame with paths</p>
                               time_limit: int) -&gt; Output:
     &#34;&#34;&#34;
     Returns list [time_left, sum, path] for the best of paths found in random walk.
-    :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
-    :param working_time: limits the duration of single path
-    :param n: number of trials for each vertex in random walk
-    :param time_limit: max number of seconds the algorithm can work
+
+    Parameters
+    ----------
+    cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    working_time: limits the duration of single path
+    n: number of trials for each vertex in random walk
+    time_limit: max number of seconds the algorithm can work
+
+    Returns
+    -------
+    Output
     &#34;&#34;&#34;
 
     start_time = time()
@@ -325,16 +361,22 @@ df_paths - validated data frame with paths</p>
         # for better performance define
         add = lst.append
         for i in range(n):
-            add(find_random_path(cities_dict, starting_city, working_time))
+            if time() - start_time &gt; time_limit:
+                break
+            else:
+                add(find_random_path(cities_dict, starting_city, working_time))
 
         # sort list [time_left, total, path] by total, descending
         lst.sort(key=lambda x: x[1], reverse=True)
+
+        if not lst:
+            return Output(path=[], total=0, time_left=working_time)
+
         best_paths.append(lst[0])
 
         # if finding the best path took 50s as far,
         # break the loop and select the best of paths found as far
         if time() - start_time &gt; time_limit:
-            print(&#34;Time limit exceeded.&#34;)
             break
 
     best_paths.sort(key=lambda x: x[1], reverse=True)
@@ -422,11 +464,18 @@ df_paths - validated data frame with paths</p>
 <dd>
 <section class="desc"><p>Solver using random walk.</p>
 <h2 id="parameters">Parameters</h2>
-<p>cities - validated data frame with cities / nodes
-edges - validated data frame with edges / paths
-df_time - validated data frame with time
-n_simulation - number of simulations per nodes
-time_limit - maximum time of arunning the algorithm (in seconds)</p>
+<dl>
+<dt><strong><code>cities</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>cities</code> / <code>nodes</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>edges</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>edges</code> / <code>paths</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>df_time</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>time</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>n_simulation</code></strong> :&ensp;<code>number</code> of <code>simulations</code> <code>per</code> <code>nodes</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>time_limit</code></strong> :&ensp;<code>maximum</code> <code>time</code> of <code>arunning</code> <code>the</code> <code>algorithm</code> (<code>in</code> <code>seconds</code>)</dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt>Solution and list of selected edges.</dt>
@@ -445,11 +494,11 @@ time_limit - maximum time of arunning the algorithm (in seconds)</p>
 
     Parameters
     ----------
-    cities - validated data frame with cities / nodes
-    edges - validated data frame with edges / paths
-    df_time - validated data frame with time
-    n_simulation - number of simulations per nodes
-    time_limit - maximum time of arunning the algorithm (in seconds)
+    cities: validated data frame with cities / nodes
+    edges: validated data frame with edges / paths
+    df_time: validated data frame with time
+    n_simulation: number of simulations per nodes
+    time_limit: maximum time of arunning the algorithm (in seconds)
 
     Returns
     -------

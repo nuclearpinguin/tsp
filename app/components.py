@@ -13,7 +13,7 @@ def error(msg: str) -> list:
 
     Parameters
     ----------
-    msg - error message
+    msg: error message
 
     Returns
     -------
@@ -29,9 +29,9 @@ def button(idx: str, txt: str, align: str = 'right'):
 
     Parameters
     ----------
-    idx - button id
-    txt - button text
-    align - css align parameter
+    idx: button id
+    txt: button text
+    align: css align parameter
 
     Returns
     -------
@@ -55,8 +55,8 @@ def graph(cities: list, edges: list):
 
     Parameters
     ----------
-    cities - list of nodes
-    edges - list of edges
+    cities: list of nodes
+    edges: list of edges
 
     Returns
     -------
@@ -78,8 +78,8 @@ def upload(idx: str, name: str = 'Select Files'):
     Reusable upload component.
     Parameters
     ----------
-    idx - element id
-    name - element name
+    idx: element id
+    name: element name
 
     Returns
     -------
@@ -115,11 +115,11 @@ def stats(solve_time: float, solution, cities: list, input_time: int = 0, new: b
 
     Parameters
     ----------
-    solve_time - time of solving
-    solution - Output object
-    cities - list of Cities
-    input_time - time provided in time.csv
-    new - True if for a new solution (requires time.csv)
+    solve_time: time of solving
+    solution: Output object
+    cities: list of Cities
+    input_time: time provided in time.csv
+    new: True if for a new solution (requires time.csv)
 
     Returns
     -------
@@ -153,8 +153,8 @@ def upload_table(name: str, df: pd.DataFrame):
 
     Parameters
     ----------
-    name - table name
-    df - data frame with data to dispaly
+    name: table name
+    df: data frame with data to dispaly
 
     Returns
     -------

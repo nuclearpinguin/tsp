@@ -18,12 +18,12 @@ def make_plot_data(cities: pd.DataFrame,
 
     Parameters
     ----------
-    cities - validated data frame with cities
-    paths - validated data frame with paths
-    time - validated data frame with time
-    simulations - number of simulations (only for random_solver)
-    time_limit - time limit for solving (in seconds)
-    exact - if True then exact_solver is being used
+    cities: validated data frame with cities
+    paths: validated data frame with paths
+    time: validated data frame with time
+    simulations: number of simulations (only for random_solver)
+    time_limit: time limit for solving (in seconds)
+    exact: if True then exact_solver is being used
 
     Returns
     -------
@@ -57,9 +57,9 @@ def data_from_solution(cities: Union[pd.DataFrame, None],
 
     Parameters
     ----------
-    cities - validated data frame with cities
-    paths - validated data frame with paths
-    solution - Output representing a solution
+    cities: validated data frame with cities
+    paths: validated data frame with paths
+    solution: Output representing a solution
 
     Returns
     -------

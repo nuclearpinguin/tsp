@@ -17,8 +17,8 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
 
     Parameters
     ----------
-    df_cities - validated data frame with cities
-    df_paths - validated data frame with paths
+    df_cities: validated data frame with cities
+    df_paths: validated data frame with paths
 
     Returns
     -------
@@ -112,10 +112,17 @@ def find_best_of_random_paths(cities_dict: dict,
                               time_limit: int) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
-    :param cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
-    :param working_time: limits the duration of single path
-    :param n: number of trials for each vertex in random walk
-    :param time_limit: max number of seconds the algorithm can work
+
+    Parameters
+    ----------
+    cities_dict: dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
+    working_time: limits the duration of single path
+    n: number of trials for each vertex in random walk
+    time_limit: max number of seconds the algorithm can work
+
+    Returns
+    -------
+    Output
     """
 
     start_time = time()
@@ -170,11 +177,11 @@ def solve(cities: pd.DataFrame,
 
     Parameters
     ----------
-    cities - validated data frame with cities / nodes
-    edges - validated data frame with edges / paths
-    df_time - validated data frame with time
-    n_simulation - number of simulations per nodes
-    time_limit - maximum time of arunning the algorithm (in seconds)
+    cities: validated data frame with cities / nodes
+    edges: validated data frame with edges / paths
+    df_time: validated data frame with time
+    n_simulation: number of simulations per nodes
+    time_limit: maximum time of arunning the algorithm (in seconds)
 
     Returns
     -------

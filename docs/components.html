@@ -37,7 +37,7 @@ def error(msg: str) -&gt; list:
 
     Parameters
     ----------
-    msg - error message
+    msg: error message
 
     Returns
     -------
@@ -53,9 +53,9 @@ def button(idx: str, txt: str, align: str = &#39;right&#39;):
 
     Parameters
     ----------
-    idx - button id
-    txt - button text
-    align - css align parameter
+    idx: button id
+    txt: button text
+    align: css align parameter
 
     Returns
     -------
@@ -79,8 +79,8 @@ def graph(cities: list, edges: list):
 
     Parameters
     ----------
-    cities - list of nodes
-    edges - list of edges
+    cities: list of nodes
+    edges: list of edges
 
     Returns
     -------
@@ -102,8 +102,8 @@ def upload(idx: str, name: str = &#39;Select Files&#39;):
     Reusable upload component.
     Parameters
     ----------
-    idx - element id
-    name - element name
+    idx: element id
+    name: element name
 
     Returns
     -------
@@ -139,11 +139,11 @@ def stats(solve_time: float, solution, cities: list, input_time: int = 0, new: b
 
     Parameters
     ----------
-    solve_time - time of solving
-    solution - Output object
-    cities - list of Cities
-    input_time - time provided in time.csv
-    new - True if for a new solution (requires time.csv)
+    solve_time: time of solving
+    solution: Output object
+    cities: list of Cities
+    input_time: time provided in time.csv
+    new: True if for a new solution (requires time.csv)
 
     Returns
     -------
@@ -177,8 +177,8 @@ def upload_table(name: str, df: pd.DataFrame):
 
     Parameters
     ----------
-    name - table name
-    df - data frame with data to dispaly
+    name: table name
+    df: data frame with data to dispaly
 
     Returns
     -------
@@ -217,9 +217,14 @@ def vbar():
 <dd>
 <section class="desc"><p>Creates constant-style button.</p>
 <h2 id="parameters">Parameters</h2>
-<p>idx - button id
-txt - button text
-align - css align parameter</p>
+<dl>
+<dt><strong><code>idx</code></strong> :&ensp;<a title="app.components.button" href="#app.components.button"><code>button()</code></a> <code>id</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>txt</code></strong> :&ensp;<a title="app.components.button" href="#app.components.button"><code>button()</code></a> <code>text</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>align</code></strong> :&ensp;<code>css</code> <code>align</code> <code>parameter</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>A</code> <code>html</code> <a title="app.components.button" href="#app.components.button"><code>button()</code></a>:</dt>
@@ -235,9 +240,9 @@ align - css align parameter</p>
 
     Parameters
     ----------
-    idx - button id
-    txt - button text
-    align - css align parameter
+    idx: button id
+    txt: button text
+    align: css align parameter
 
     Returns
     -------
@@ -260,7 +265,10 @@ align - css align parameter</p>
 <dd>
 <section class="desc"><p>Creates paragraph with error message.</p>
 <h2 id="parameters">Parameters</h2>
-<p>msg - error message</p>
+<dl>
+<dt><strong><code>msg</code></strong> :&ensp;<a title="app.components.error" href="#app.components.error"><code>error()</code></a> <code>message</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>A</code> <code>html</code> <code>paragraph</code>:</dt>
@@ -275,7 +283,7 @@ align - css align parameter</p>
 
     Parameters
     ----------
-    msg - error message
+    msg: error message
 
     Returns
     -------
@@ -292,8 +300,12 @@ align - css align parameter</p>
 <section class="desc"><p>Creates plotly network graph using supplied
 cities (nodes) and edges.</p>
 <h2 id="parameters">Parameters</h2>
-<p>cities - list of nodes
-edges - list of edges</p>
+<dl>
+<dt><strong><code>cities</code></strong> :&ensp;<code>list</code> of <code>nodes</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>edges</code></strong> :&ensp;<code>list</code> of <code>edges</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>Rendered</code> <code>plotly</code> <a title="app.components.graph" href="#app.components.graph"><code>graph()</code></a>:</dt>
@@ -310,8 +322,8 @@ edges - list of edges</p>
 
     Parameters
     ----------
-    cities - list of nodes
-    edges - list of edges
+    cities: list of nodes
+    edges: list of edges
 
     Returns
     -------
@@ -334,11 +346,18 @@ edges - list of edges</p>
 <dd>
 <section class="desc"><p>Reusable component for solution statistics.</p>
 <h2 id="parameters">Parameters</h2>
-<p>solve_time - time of solving
-solution - Output object
-cities - list of Cities
-input_time - time provided in time.csv
-new - True if for a new solution (requires time.csv)</p>
+<dl>
+<dt><strong><code>solve_time</code></strong> :&ensp;<code>time</code> of <code>solving</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>solution</code></strong> :&ensp;<code>Output</code> <code>object</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>cities</code></strong> :&ensp;<code>list</code> of <code>Cities</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>input_time</code></strong> :&ensp;<code>time</code> <code>provided</code> <code>in</code> <code>time.csv</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>new</code></strong> :&ensp;<code>True</code> <code>if</code> <code>for</code> <code>a</code> <code>new</code> <code>solution</code> (<code>requires</code> <code>time.csv</code>)</dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>html</code> <code>div</code></dt>
@@ -352,11 +371,11 @@ new - True if for a new solution (requires time.csv)</p>
 
     Parameters
     ----------
-    solve_time - time of solving
-    solution - Output object
-    cities - list of Cities
-    input_time - time provided in time.csv
-    new - True if for a new solution (requires time.csv)
+    solve_time: time of solving
+    solution: Output object
+    cities: list of Cities
+    input_time: time provided in time.csv
+    new: True if for a new solution (requires time.csv)
 
     Returns
     -------
@@ -391,8 +410,12 @@ new - True if for a new solution (requires time.csv)</p>
 <section class="desc"><p>Reusable upload component.
 Parameters</p>
 <hr>
-<p>idx - element id
-name - element name</p>
+<dl>
+<dt><strong><code>idx</code></strong> :&ensp;<code>element</code> <code>id</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>element</code> <code>name</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>html</code> <code>div</code></dt>
@@ -405,8 +428,8 @@ name - element name</p>
     Reusable upload component.
     Parameters
     ----------
-    idx - element id
-    name - element name
+    idx: element id
+    name: element name
 
     Returns
     -------
@@ -442,8 +465,12 @@ name - element name</p>
 <dd>
 <section class="desc"><p>Reusable component for html table.</p>
 <h2 id="parameters">Parameters</h2>
-<p>name - table name
-df - data frame with data to dispaly</p>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>table</code> <code>name</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>df</code></strong> :&ensp;<code>data</code> <code>frame</code> <code>with</code> <code>data</code> <code>to</code> <code>dispaly</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>html</code> <code>div</code></dt>
@@ -457,8 +484,8 @@ df - data frame with data to dispaly</p>
 
     Parameters
     ----------
-    name - table name
-    df - data frame with data to dispaly
+    name: table name
+    df: data frame with data to dispaly
 
     Returns
     -------

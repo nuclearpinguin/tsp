@@ -14,9 +14,9 @@ def save_solution(solution: Output, time: int, new: bool = True) -> None:
 
     Parameters
     ----------
-    solution - Output with solution data
-    time - value provided in time.csv
-    new - True if solution is a new solution
+    solution: Output with solution data
+    time: value provided in time.csv
+    new: True if solution is a new solution
     """
     if new:
         txt = '['
@@ -42,7 +42,7 @@ def validate_cities(df: pd.DataFrame) -> Result:
 
     Parameters
     ----------
-    df - data frame with cities
+    df: data frame with cities
 
     Returns
     -------
@@ -82,8 +82,8 @@ def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
 
     Parameters
     ----------
-    df - data frame with paths
-    cities - data frame with cities
+    df: data frame with paths
+    cities: data frame with cities
 
     Returns
     -------
@@ -156,7 +156,7 @@ def validate_time(df: pd.DataFrame) -> Result:
 
     Parameters
     ----------
-    df - data frame with time
+    df: data frame with time
 
     Returns
     -------
@@ -219,7 +219,7 @@ def validate_solution(content: str) -> Result:
 
     Parameters
     ----------
-    content - raw input (bytes?)
+    content: raw input (bytes?)
 
     Returns
     -------

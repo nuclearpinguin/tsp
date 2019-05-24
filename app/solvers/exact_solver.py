@@ -9,12 +9,12 @@ def choose_the_best_path(resources, cities_list):
 
     Parameters
     ----------
-    resources - list of all possible paths [[path_1], [path_2], [path_3], ...]
-    cities_list - list of all possible cities [city_A, city_B, city_C,..]
+    resources: list of all possible paths [[path_1], [path_2], [path_3], ...]
+    cities_list: list of all possible cities [city_A, city_B, city_C,..]
 
     Returns
     -------
-    A dictionary - values with paths {'value_1' : [path_i], 'value_2' : [path_y],...}
+    A dictionary: values with paths {'value_1' : [path_i], 'value_2' : [path_y],...}
     """
     summary = {}
     g = 0
@@ -37,7 +37,7 @@ def return_the_best_value(dict_temp: dict) -> int:
 
     Parameters
     ----------
-    dict_temp - dictionary representing paths {'value_1' : [path_i], 'value_2' : [path_y],...}
+    dict_temp: dictionary representing paths {'value_1' : [path_i], 'value_2' : [path_y],...}
 
     Returns 
     -------
@@ -53,9 +53,9 @@ def return_path_time(graph, dict_temp_two, best):
 
     Parameters
     ----------
-    graph - ?
-    dict_temp_two - dictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
-    best - the best possible value - value_y
+    graph: ?
+    dict_temp_two: dictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best: the best possible value - value_y
 
     Returns 
     -------
@@ -76,8 +76,8 @@ def create_answer_for_path_creation(dict_temp_three, best):
 
     Parameters
     ----------
-    dict_temp_three - ictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
-    best - the best possible value - value_y
+    dict_temp_three: ictionary - values with paths  {'value_1' : [path_i], 'value_2' : [path_y],...}
+    best: the best possible value - value_y
 
     Returns 
     -------
@@ -99,11 +99,11 @@ def exact_solve(cities: pd.DataFrame,
 
     Parameters
     ----------
-    cities - validated data frame with cities / nodes
-    edges - validated data frame with edges / paths
-    df_time - validated data frame with time
-    n_simulation - number of simulations per nodes
-    time_limit - maximum time of arunning the algorithm (in seconds)
+    cities: validated data frame with cities / nodes
+    edges: validated data frame with edges / paths
+    df_time: validated data frame with time
+    n_simulation: number of simulations per nodes
+    time_limit: maximum time of arunning the algorithm (in seconds)
 
     Returns
     -------
@@ -122,10 +122,10 @@ def exact_solve(cities: pd.DataFrame,
         Parameters
         ----------
         graph
-        start - starting node
-        time_left - time which still can be used for next steps in path creations 
-        path - list of cities on path [city_1, city_2, city_3]
-        time_used - information how much time has been used
+        start: starting node
+        time_left: time which still can be used for next steps in path creations
+        path: list of cities on path [city_1, city_2, city_3]
+        time_used: information how much time has been used
 
         Returns 
         -------
@@ -152,8 +152,8 @@ def exact_solve(cities: pd.DataFrame,
 
         Parameters
         ----------
-        graph - graph which we will use to create paths
-        time_at_the_beggining - time at the beggining of path creation
+        graph: graph which we will use to create paths
+        time_at_the_beggining: time at the beggining of path creation
 
         Returns 
         -------
