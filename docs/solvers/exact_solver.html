@@ -29,9 +29,16 @@ from .random_solver import convert_to_dict, Output
 
 def choose_the_best_path(resources, cities_list):
     &#34;&#34;&#34;
-    Resource is a list of possible paths with an eye on possible time
-    cities list is used to hold an information if city has been visited or not
-    function returns summary - path with profits
+    Selects best path.
+
+    Parameters
+    ----------
+    resources: list of all possible paths [[path_1], [path_2], [path_3], ...]
+    cities_list: list of all possible cities [city_A, city_B, city_C,..]
+
+    Returns
+    -------
+    A dictionary: values with paths {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
     &#34;&#34;&#34;
     summary = {}
     g = 0
@@ -48,14 +55,36 @@ def choose_the_best_path(resources, cities_list):
     return summary
 
 
-def return_the_best_value(dict_temp):
-    &#34;&#34;&#34;Returns the best profit from dictionary which consist of paths with profits.&#34;&#34;&#34;
+def return_the_best_value(dict_temp: dict) -&gt; int:
+    &#34;&#34;&#34;
+    Returns the best profit from dictionary which consist of paths with profits.
+
+    Parameters
+    ----------
+    dict_temp: dictionary representing paths {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
+
+    Returns 
+    -------
+    The best possible value
+    &#34;&#34;&#34;
     naj = max(dict_temp.keys())
     return naj
 
 
 def return_path_time(graph, dict_temp_two, best):
-    &#34;&#34;&#34;Returns the cost on the best (from profit side) path&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Returns the cost on the best (from profit side) path.
+
+    Parameters
+    ----------
+    graph: ?
+    dict_temp_two: dictionary - values with paths  {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
+    best: the best possible value - value_y
+
+    Returns 
+    -------
+    Time which is used to do the best path
+    &#34;&#34;&#34;
     w = 1
     cost = 0
     do = len(dict_temp_two[best]) - 1
@@ -66,7 +95,18 @@ def return_path_time(graph, dict_temp_two, best):
 
 
 def create_answer_for_path_creation(dict_temp_three, best):
-    &#34;&#34;&#34;Creates special form of answer for path creation&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Creates special form of answer for path creation.
+
+    Parameters
+    ----------
+    dict_temp_three: ictionary - values with paths  {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
+    best: the best possible value - value_y
+
+    Returns 
+    -------
+    A special list of cities - [{city_1,city_2),(city_2,city_3),...]
+    &#34;&#34;&#34;
     answer_plot = []
     do = len(dict_temp_three[best]) - 1
     for x in range(do):
@@ -74,15 +114,47 @@ def create_answer_for_path_creation(dict_temp_three, best):
     return answer_plot
 
 
-def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, time_limit: int = 20):
+def exact_solve(cities: pd.DataFrame,
+                paths: pd.DataFrame,
+                df_time: pd.DataFrame,
+                time_limit: int = 20):
+    &#34;&#34;&#34;
+    Solver using random walk.
+
+    Parameters
+    ----------
+    cities: validated data frame with cities / nodes
+    edges: validated data frame with edges / paths
+    df_time: validated data frame with time
+    n_simulation: number of simulations per nodes
+    time_limit: maximum time of arunning the algorithm (in seconds)
+
+    Returns
+    -------
+    Solution and list of selected edges.
+    Tuple[Output, list]
+    &#34;&#34;&#34;
     print(&#39;Works exact&#39;)
 
     assert isinstance(cities, pd.DataFrame), &#39;Wrong data format!&#39;
     assert isinstance(paths, pd.DataFrame), &#39;Wrong data format!&#39;
-    assert isinstance(time, pd.DataFrame), &#39;Wrong data format!&#39;
+    assert isinstance(df_time, pd.DataFrame), &#39;Wrong data format!&#39;
 
     def find_all_possible_paths(graph, start, time_left, path=[], time_used=0):
-        &#34;&#34;&#34; Finds all paths from chosen start point with eye on possible time &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Finds possible path in graph starting at start node.
+        Parameters
+        ----------
+        graph
+        start: starting node
+        time_left: time which still can be used for next steps in path creations
+        path: list of cities on path [city_1, city_2, city_3]
+        time_used: information how much time has been used
+
+        Returns 
+        -------
+        A list - [city_1, city_2, city_3, city_4]
+        &#34;&#34;&#34;
         nonlocal all_paths
         time_left = time_left - time_used
         path = path + [start]
@@ -99,15 +171,24 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
         return all_paths
 
     def create_all_possible_paths(graph, time_at_the_beggining):
-        &#34;&#34;&#34; General paths creating for all possible starting points &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Finds all possible paths in graph.
+
+        Parameters
+        ----------
+        graph: graph which we will use to create paths
+        time_at_the_beggining: time at the beggining of path creation
+
+        Returns 
+        -------
+        A list [[path_1], [path_2], [path_3], ...]
+        &#34;&#34;&#34;
         list_of_paths = []
         for x in graph.keys():
-            # all_paths = []
             list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
-            print(x)
         return list_of_paths
 
-    working_time = time[&#39;time&#39;].values[0]
+    working_time = df_time[&#39;time&#39;].values[0]
 
     d = convert_to_dict(cities, paths)
 
@@ -129,15 +210,16 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 
     path_answer = create_answer_for_path_creation(cities_dict_with_values, best_profit)
 
-    solution = [working_time - path_time, best_profit, cities_dict_with_values[best_profit]]
-
-    print(solution)
-
+    # set a list composed of City objects, for historical reasons
+    result_path = []
+    for item in path_answer:
+        result_path.append(cities_dict[item[0]])
+    
     output = Output(time_left=working_time - path_time,
-                    path=path_answer,
+                    path=result_path,
                     total=best_profit)
-    print(output)
-    return output, []</code></pre>
+
+    return output, path_answer</code></pre>
 </details>
 </section>
 <section>
@@ -151,16 +233,33 @@ def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, t
 <span>def <span class="ident">choose_the_best_path</span></span>(<span>resources, cities_list)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Resource is a list of possible paths with an eye on possible time
-cities list is used to hold an information if city has been visited or not
-function returns summary - path with profits</p></section>
+<section class="desc"><p>Selects best path.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>resources</code></strong> :&ensp;<code>list</code> of <code>all</code> <code>possible</code> <code>paths</code> [[<code>path_1</code>], [<code>path_2</code>], [<code>path_3</code>], <code>...</code>]</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>cities_list</code></strong> :&ensp;<code>list</code> of <code>all</code> <code>possible</code> <code>cities</code> [<code>city_A</code>, <code>city_B</code>, <code>city_C</code>,<code>..</code>]</dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>A</code> <code>dictionary</code>: <code>values</code> <code>with</code> <code>paths</code> {<code>'value_1'</code> : [<code>path_i</code>], <code>'value_2'</code> : [<code>path_y</code>],<code>...</code>}</dt>
+<dd>&nbsp;</dd>
+</dl></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def choose_the_best_path(resources, cities_list):
     &#34;&#34;&#34;
-    Resource is a list of possible paths with an eye on possible time
-    cities list is used to hold an information if city has been visited or not
-    function returns summary - path with profits
+    Selects best path.
+
+    Parameters
+    ----------
+    resources: list of all possible paths [[path_1], [path_2], [path_3], ...]
+    cities_list: list of all possible cities [city_A, city_B, city_C,..]
+
+    Returns
+    -------
+    A dictionary: values with paths {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
     &#34;&#34;&#34;
     summary = {}
     g = 0
@@ -181,11 +280,32 @@ function returns summary - path with profits</p></section>
 <span>def <span class="ident">create_answer_for_path_creation</span></span>(<span>dict_temp_three, best)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Creates special form of answer for path creation</p></section>
+<section class="desc"><p>Creates special form of answer for path creation.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>dict_temp_three</code></strong> :&ensp;<code>ictionary</code> - <code>values</code> <code>with</code> <code>paths</code>
+{<code>'value_1'</code> : [<code>path_i</code>], <code>'value_2'</code> : [<code>path_y</code>],<code>...</code>}</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>best</code></strong> :&ensp;<code>the</code> <code>best</code> <code>possible</code> <code>value</code> - <code>value_y</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A special list of cities - [{city_1,city_2),(city_2,city_3),&hellip;]</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def create_answer_for_path_creation(dict_temp_three, best):
-    &#34;&#34;&#34;Creates special form of answer for path creation&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Creates special form of answer for path creation.
+
+    Parameters
+    ----------
+    dict_temp_three: ictionary - values with paths  {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
+    best: the best possible value - value_y
+
+    Returns 
+    -------
+    A special list of cities - [{city_1,city_2),(city_2,city_3),...]
+    &#34;&#34;&#34;
     answer_plot = []
     do = len(dict_temp_three[best]) - 1
     for x in range(do):
@@ -194,21 +314,72 @@ function returns summary - path with profits</p></section>
 </details>
 </dd>
 <dt id="app.solvers.exact_solver.exact_solve"><code class="name flex">
-<span>def <span class="ident">exact_solve</span></span>(<span>cities, paths, time, time_limit=20)</span>
+<span>def <span class="ident">exact_solve</span></span>(<span>cities, paths, df_time, time_limit=20)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>Solver using random walk.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>cities</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>cities</code> / <code>nodes</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>edges</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>edges</code> / <code>paths</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>df_time</code></strong> :&ensp;<code>validated</code> <code>data</code> <code>frame</code> <code>with</code> <code>time</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>n_simulation</code></strong> :&ensp;<code>number</code> of <code>simulations</code> <code>per</code> <code>nodes</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>time_limit</code></strong> :&ensp;<code>maximum</code> <code>time</code> of <code>arunning</code> <code>the</code> <code>algorithm</code> (<code>in</code> <code>seconds</code>)</dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt>Solution and list of selected edges.</dt>
+<dt><code>Tuple</code>[<code>Output</code>, <code>list</code>]</dt>
+<dd>&nbsp;</dd>
+</dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def exact_solve(cities: pd.DataFrame, paths: pd.DataFrame, time: pd.DataFrame, time_limit: int = 20):
+<pre><code class="python">def exact_solve(cities: pd.DataFrame,
+                paths: pd.DataFrame,
+                df_time: pd.DataFrame,
+                time_limit: int = 20):
+    &#34;&#34;&#34;
+    Solver using random walk.
+
+    Parameters
+    ----------
+    cities: validated data frame with cities / nodes
+    edges: validated data frame with edges / paths
+    df_time: validated data frame with time
+    n_simulation: number of simulations per nodes
+    time_limit: maximum time of arunning the algorithm (in seconds)
+
+    Returns
+    -------
+    Solution and list of selected edges.
+    Tuple[Output, list]
+    &#34;&#34;&#34;
     print(&#39;Works exact&#39;)
 
     assert isinstance(cities, pd.DataFrame), &#39;Wrong data format!&#39;
     assert isinstance(paths, pd.DataFrame), &#39;Wrong data format!&#39;
-    assert isinstance(time, pd.DataFrame), &#39;Wrong data format!&#39;
+    assert isinstance(df_time, pd.DataFrame), &#39;Wrong data format!&#39;
 
     def find_all_possible_paths(graph, start, time_left, path=[], time_used=0):
-        &#34;&#34;&#34; Finds all paths from chosen start point with eye on possible time &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Finds possible path in graph starting at start node.
+        Parameters
+        ----------
+        graph
+        start: starting node
+        time_left: time which still can be used for next steps in path creations
+        path: list of cities on path [city_1, city_2, city_3]
+        time_used: information how much time has been used
+
+        Returns 
+        -------
+        A list - [city_1, city_2, city_3, city_4]
+        &#34;&#34;&#34;
         nonlocal all_paths
         time_left = time_left - time_used
         path = path + [start]
@@ -225,15 +396,24 @@ function returns summary - path with profits</p></section>
         return all_paths
 
     def create_all_possible_paths(graph, time_at_the_beggining):
-        &#34;&#34;&#34; General paths creating for all possible starting points &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Finds all possible paths in graph.
+
+        Parameters
+        ----------
+        graph: graph which we will use to create paths
+        time_at_the_beggining: time at the beggining of path creation
+
+        Returns 
+        -------
+        A list [[path_1], [path_2], [path_3], ...]
+        &#34;&#34;&#34;
         list_of_paths = []
         for x in graph.keys():
-            # all_paths = []
             list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
-            print(x)
         return list_of_paths
 
-    working_time = time[&#39;time&#39;].values[0]
+    working_time = df_time[&#39;time&#39;].values[0]
 
     d = convert_to_dict(cities, paths)
 
@@ -255,26 +435,51 @@ function returns summary - path with profits</p></section>
 
     path_answer = create_answer_for_path_creation(cities_dict_with_values, best_profit)
 
-    solution = [working_time - path_time, best_profit, cities_dict_with_values[best_profit]]
-
-    print(solution)
-
+    # set a list composed of City objects, for historical reasons
+    result_path = []
+    for item in path_answer:
+        result_path.append(cities_dict[item[0]])
+    
     output = Output(time_left=working_time - path_time,
-                    path=path_answer,
+                    path=result_path,
                     total=best_profit)
-    print(output)
-    return output, []</code></pre>
+
+    return output, path_answer</code></pre>
 </details>
 </dd>
 <dt id="app.solvers.exact_solver.return_path_time"><code class="name flex">
 <span>def <span class="ident">return_path_time</span></span>(<span>graph, dict_temp_two, best)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns the cost on the best (from profit side) path</p></section>
+<section class="desc"><p>Returns the cost on the best (from profit side) path.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>graph</code></strong> :&ensp;?</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>dict_temp_two</code></strong> :&ensp;<code>dictionary</code> - <code>values</code> <code>with</code> <code>paths</code>
+{<code>'value_1'</code> : [<code>path_i</code>], <code>'value_2'</code> : [<code>path_y</code>],<code>...</code>}</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>best</code></strong> :&ensp;<code>the</code> <code>best</code> <code>possible</code> <code>value</code> - <code>value_y</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Time which is used to do the best path</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def return_path_time(graph, dict_temp_two, best):
-    &#34;&#34;&#34;Returns the cost on the best (from profit side) path&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Returns the cost on the best (from profit side) path.
+
+    Parameters
+    ----------
+    graph: ?
+    dict_temp_two: dictionary - values with paths  {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
+    best: the best possible value - value_y
+
+    Returns 
+    -------
+    Time which is used to do the best path
+    &#34;&#34;&#34;
     w = 1
     cost = 0
     do = len(dict_temp_two[best]) - 1
@@ -288,11 +493,28 @@ function returns summary - path with profits</p></section>
 <span>def <span class="ident">return_the_best_value</span></span>(<span>dict_temp)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns the best profit from dictionary which consist of paths with profits.</p></section>
+<section class="desc"><p>Returns the best profit from dictionary which consist of paths with profits.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>dict_temp</code></strong> :&ensp;<code>dictionary</code> <code>representing</code> <code>paths</code> {<code>'value_1'</code> : [<code>path_i</code>], <code>'value_2'</code> : [<code>path_y</code>],<code>...</code>}</dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The best possible value</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def return_the_best_value(dict_temp):
-    &#34;&#34;&#34;Returns the best profit from dictionary which consist of paths with profits.&#34;&#34;&#34;
+<pre><code class="python">def return_the_best_value(dict_temp: dict) -&gt; int:
+    &#34;&#34;&#34;
+    Returns the best profit from dictionary which consist of paths with profits.
+
+    Parameters
+    ----------
+    dict_temp: dictionary representing paths {&#39;value_1&#39; : [path_i], &#39;value_2&#39; : [path_y],...}
+
+    Returns 
+    -------
+    The best possible value
+    &#34;&#34;&#34;
     naj = max(dict_temp.keys())
     return naj</code></pre>
 </details>

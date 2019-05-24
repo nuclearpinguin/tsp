@@ -38,9 +38,9 @@ def save_solution(solution: Output, time: int, new: bool = True) -&gt; None:
 
     Parameters
     ----------
-    solution - Output with solution data
-    time - value provided in time.csv
-    new - True if solution is a new solution
+    solution: Output with solution data
+    time: value provided in time.csv
+    new: True if solution is a new solution
     &#34;&#34;&#34;
     if new:
         txt = &#39;[&#39;
@@ -66,7 +66,7 @@ def validate_cities(df: pd.DataFrame) -&gt; Result:
 
     Parameters
     ----------
-    df - data frame with cities
+    df: data frame with cities
 
     Returns
     -------
@@ -106,8 +106,8 @@ def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -&gt; Result:
 
     Parameters
     ----------
-    df - data frame with paths
-    cities - data frame with cities
+    df: data frame with paths
+    cities: data frame with cities
 
     Returns
     -------
@@ -180,7 +180,7 @@ def validate_time(df: pd.DataFrame) -&gt; Result:
 
     Parameters
     ----------
-    df - data frame with time
+    df: data frame with time
 
     Returns
     -------
@@ -243,7 +243,7 @@ def validate_solution(content: str) -&gt; Result:
 
     Parameters
     ----------
-    content - raw input (bytes?)
+    content: raw input (bytes?)
 
     Returns
     -------
@@ -340,9 +340,14 @@ def validate_solution(content: str) -&gt; Result:
 <dd>
 <section class="desc"><p>Saves solution to .txt file.</p>
 <h2 id="parameters">Parameters</h2>
-<p>solution - Output with solution data
-time - value provided in time.csv
-new - True if solution is a new solution</p></section>
+<dl>
+<dt><strong><code>solution</code></strong> :&ensp;<code>Output</code> <code>with</code> <code>solution</code> <code>data</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>time</code></strong> :&ensp;<code>value</code> <code>provided</code> <code>in</code> <code>time.csv</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>new</code></strong> :&ensp;<code>True</code> <code>if</code> <code>solution</code> <code>is</code> <code>a</code> <code>new</code> <code>solution</code></dt>
+<dd>&nbsp;</dd>
+</dl></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def save_solution(solution: Output, time: int, new: bool = True) -&gt; None:
@@ -351,9 +356,9 @@ new - True if solution is a new solution</p></section>
 
     Parameters
     ----------
-    solution - Output with solution data
-    time - value provided in time.csv
-    new - True if solution is a new solution
+    solution: Output with solution data
+    time: value provided in time.csv
+    new: True if solution is a new solution
     &#34;&#34;&#34;
     if new:
         txt = &#39;[&#39;
@@ -394,7 +399,10 @@ new - True if solution is a new solution</p></section>
 <dd>
 <section class="desc"><p>Validates cities input.</p>
 <h2 id="parameters">Parameters</h2>
-<p>df - data frame with cities</p>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>data</code> <code>frame</code> <code>with</code> <code>cities</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>True if file is valid, else False.</p></section>
 <details class="source">
@@ -405,7 +413,7 @@ new - True if solution is a new solution</p></section>
 
     Parameters
     ----------
-    df - data frame with cities
+    df: data frame with cities
 
     Returns
     -------
@@ -445,8 +453,12 @@ new - True if solution is a new solution</p></section>
 <dd>
 <section class="desc"><p>Validates paths input.</p>
 <h2 id="parameters">Parameters</h2>
-<p>df - data frame with paths
-cities - data frame with cities</p>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>data</code> <code>frame</code> <code>with</code> <code>paths</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>cities</code></strong> :&ensp;<code>data</code> <code>frame</code> <code>with</code> <code>cities</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>True if file is valid, else False.</p></section>
 <details class="source">
@@ -457,8 +469,8 @@ cities - data frame with cities</p>
 
     Parameters
     ----------
-    df - data frame with paths
-    cities - data frame with cities
+    df: data frame with paths
+    cities: data frame with cities
 
     Returns
     -------
@@ -531,7 +543,10 @@ cities - data frame with cities</p>
 <dd>
 <section class="desc"><p>Validates solution input.</p>
 <h2 id="parameters">Parameters</h2>
-<p>content - raw input (bytes?)</p>
+<dl>
+<dt><strong><code>content</code></strong> :&ensp;<code>raw</code> <code>input</code> (<code>bytes</code>?)</dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>True if file is valid, else False.</p></section>
 <details class="source">
@@ -542,7 +557,7 @@ cities - data frame with cities</p>
 
     Parameters
     ----------
-    content - raw input (bytes?)
+    content: raw input (bytes?)
 
     Returns
     -------
@@ -582,7 +597,10 @@ cities - data frame with cities</p>
 <dd>
 <section class="desc"><p>Validates time input.</p>
 <h2 id="parameters">Parameters</h2>
-<p>df - data frame with time</p>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>data</code> <code>frame</code> <code>with</code> <code>time</code></dt>
+<dd>&nbsp;</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>True if file is valid, else False.</p></section>
 <details class="source">
@@ -593,7 +611,7 @@ cities - data frame with cities</p>
 
     Parameters
     ----------
-    df - data frame with time
+    df: data frame with time
 
     Returns
     -------

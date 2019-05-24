@@ -52,8 +52,8 @@ def make_graph(nodes: list, edges: list):
 
     Parameters
     ----------
-    nodes - list of nodes compatible with networx
-    edges - list of edges compatible with networx
+    nodes: list of nodes compatible with networx
+    edges: list of edges compatible with networx
 
     Returns
     -------
