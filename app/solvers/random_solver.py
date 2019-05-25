@@ -139,6 +139,7 @@ def find_best_of_random_paths(cities_dict: dict,
 
     best_paths = []
     for starting_city in cities_dict.keys():
+        print(starting_city)
         lst = []
 
         # for better performance define
@@ -157,9 +158,10 @@ def find_best_of_random_paths(cities_dict: dict,
 
         best_paths.append(lst[0])
 
-        # if finding the best path took 50s as far,
+        # if finding the best path took time_limit [in seconds] as far,
         # break the loop and select the best of paths found as far
         if time() - start_time > time_limit:
+            print("Time limit exceeded")
             break
 
     best_paths.sort(key=lambda x: x[1], reverse=True)
@@ -198,6 +200,8 @@ def solve(cities: pd.DataFrame,
     Solution and list of selected edges.
     Tuple[Output, list]
     """
+    time_start = time()
+
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
     assert isinstance(df_time, pd.DataFrame), 'Wrong data format!'
@@ -219,6 +223,6 @@ def solve(cities: pd.DataFrame,
     working_time = df_time['time'].values[0]
 
     # compute the best path
-    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit=60 - (time()-time_start))
 
     return solution, convert_to_edges_list(solution.path)
