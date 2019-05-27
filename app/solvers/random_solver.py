@@ -135,11 +135,15 @@ def find_best_of_random_paths(cities_dict: dict,
     Output
     """
 
+    # in case data processing took too long,
+    # give the algorythm 2s to process
+    if time_limit<0:
+        time_limit=2
+
     start_time = time()
 
     best_paths = []
     for starting_city in cities_dict.keys():
-        print(starting_city)
         lst = []
 
         # for better performance define
@@ -223,6 +227,6 @@ def solve(cities: pd.DataFrame,
     working_time = df_time['time'].values[0]
 
     # compute the best path
-    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit=60 - (time()-time_start))
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit=time_limit - (time()-time_start))
 
     return solution, convert_to_edges_list(solution.path)
