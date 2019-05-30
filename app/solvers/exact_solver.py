@@ -165,9 +165,9 @@ def exact_solve(cities: pd.DataFrame,
         for x in graph.keys():
             list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
             print(x)
-            end = time_temp()
+            end = time_temp() - start
             if time_limit - end <0:
-                beak
+                break
         return list_of_paths
 
     working_time = df_time['time'].values[0]
