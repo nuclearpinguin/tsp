@@ -1,0 +1,17 @@
+city_from,city_to,travel_time
+A,B,1
+B,C,2
+B,D,3
+B,E,4
+E,F,5
+E,G,4
+E,H,3
+H,I,2
+H,J,3
+H,K,4
+K,L,5
+K,M,6
+K,N,5
+N,O,4
+N,P,3
+N,R,6

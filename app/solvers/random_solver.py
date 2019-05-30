@@ -12,8 +12,7 @@ Output = namedtuple('Output', ['time_left', 'total', 'path'])
 
 def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
     """
-    Converts data frames of cities and paths to a dictionary
-    {city: {neighbour : time_to_neighbour}}.
+    Converts data frames of cities and paths to a dictionary.
 
     Parameters
     ----------
@@ -42,9 +41,20 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame) -> dict:
 def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> Output:
     """
     Generates a list containing: time, total and random path.
+
+    Parameters
+    ----------
+    cities_dict - dictionary {name : {neighbour1 : travel_time1, neighbour2 : travel_time2}},
+                  obtained from convert_to_dict function
+    starting_city - City object, from which the path starts
+    time_left - number of hours until salesman can travel no more
+
+    Returns
+    -------
+    A tuple (Output) containing: time, total and path.
     """
 
-    path = []
+    path=[]
     tmp_time = time_left
     total = 0
     curr_city = cities_dict[starting_city]
@@ -125,6 +135,11 @@ def find_best_of_random_paths(cities_dict: dict,
     Output
     """
 
+    # in case data processing took too long,
+    # give the algorythm 2s to process
+    if time_limit<0:
+        time_limit=2
+
     start_time = time()
 
     best_paths = []
@@ -147,9 +162,10 @@ def find_best_of_random_paths(cities_dict: dict,
 
         best_paths.append(lst[0])
 
-        # if finding the best path took 50s as far,
+        # if finding the best path took time_limit [in seconds] as far,
         # break the loop and select the best of paths found as far
         if time() - start_time > time_limit:
+            print("Time limit exceeded")
             break
 
     best_paths.sort(key=lambda x: x[1], reverse=True)
@@ -188,6 +204,8 @@ def solve(cities: pd.DataFrame,
     Solution and list of selected edges.
     Tuple[Output, list]
     """
+    time_start = time()
+
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
     assert isinstance(df_time, pd.DataFrame), 'Wrong data format!'
@@ -209,6 +227,6 @@ def solve(cities: pd.DataFrame,
     working_time = df_time['time'].values[0]
 
     # compute the best path
-    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit=time_limit - (time()-time_start))
 
     return solution, convert_to_edges_list(solution.path)
