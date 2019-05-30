@@ -39,14 +39,14 @@ def convert_to_dict(df_cities: pd.DataFrame, df_paths: pd.DataFrame, time_limit:
         print(f"Preprocessing in progress: \t{round((i+1)/df_cities['name'].count()*100)}%", end="\r")  # /{df_cities['name'].count()}
 
         toc = time() - tic
+
         if time_limit - toc < 0:
             print(f"Whoops! It seems that preprocessing data "
-              f"is taking longer than given limit ({round(time_limit,2)}s). "
-              "No solution was found.")
+                  f"is taking longer than given limit ({round(time_limit,2)}s). "
+                  "No solution was found.")
             break
     print()
     print(f"Preprocessing time:\t\t{round(toc,2)}s")
-
 
     return dict_paths
 
@@ -67,7 +67,7 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
     A tuple (Output) containing: time, total and path.
     """
 
-    path=[]
+    path = []
     tmp_time = time_left
     total = 0
     curr_city = cities_dict[starting_city]
@@ -165,7 +165,7 @@ def find_best_of_random_paths(cities_dict: dict,
                 add(find_random_path(cities_dict, starting_city, working_time))
 
         # sort list [time_left, total, path] by total, descending
-        lst.sort(key=lambda x: x[1], reverse=True)
+        lst.sort(key=lambda x: x.total, reverse=True)
 
         if not lst:
             return Output(path=[], total=0, time_left=working_time)
@@ -179,7 +179,7 @@ def find_best_of_random_paths(cities_dict: dict,
             print("Time limit exceeded")
             break
 
-    best_paths.sort(key=lambda x: x[1], reverse=True)
+    best_paths.sort(key=lambda x: x.total, reverse=True)
 
     return best_paths[0]
 
@@ -230,6 +230,7 @@ def solve(cities: pd.DataFrame,
     cities_dict = {}
 
     tic_dict = time()
+
     for (i, k) in enumerate(d.keys()):
         print(f"Creating dictionary:\t\t{round((i+1)/len(d.keys())*100)}%", end="\r")
 
@@ -242,6 +243,7 @@ def solve(cities: pd.DataFrame,
     toc_dict = time() - tic_dict
     print()
     print(f"Creating dictionary time:\t{round(toc_dict,2)}s")
+
 
     # get working time from the data frame
     working_time = df_time['time'].values[0]
@@ -264,6 +266,7 @@ def solve(cities: pd.DataFrame,
         # worst solution found as far
         worst_solu = Output(time_left, 1000, [])
 
+
         # for displaying in later statistics
         iterations_counter = 0
 
@@ -272,6 +275,7 @@ def solve(cities: pd.DataFrame,
 
         # while there is still time left
         while time_left - toc_solu > 0.1:
+
             # execution time of the algorithm
             tic_solu = time()
 
@@ -300,6 +304,7 @@ def solve(cities: pd.DataFrame,
         print(f"> Worst solution total:\t{worst_solu.total}")
         print(f"> Looping profit:\t{best_solu.total - worst_solu.total}")
         print(f"> Iterations:\t\t{iterations_counter}")
+
         print("Solving finished.")
 
     return best_solu, convert_to_edges_list(best_solu.path)
