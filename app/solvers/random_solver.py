@@ -187,7 +187,7 @@ def solve(cities: pd.DataFrame,
           edges: pd.DataFrame,
           df_time: pd.DataFrame,
           n_simulation: int = 50,
-          time_limit: int = 20) -> Tuple[Output, list]:
+          time_limit: int = 60) -> Tuple[Output, list]:
     """
     Solver using random walk.
 
@@ -204,7 +204,7 @@ def solve(cities: pd.DataFrame,
     Solution and list of selected edges.
     Tuple[Output, list]
     """
-    time_start = time()
+    tic = time()
 
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
@@ -226,7 +226,49 @@ def solve(cities: pd.DataFrame,
     # get working time from the data frame
     working_time = df_time['time'].values[0]
 
+    toc = time()
+
+    # subtract time needed to preprocess data from available time
+    time_limit -= toc-tic
+
+    # measure execution time of the algorythm
+    tic_solu = time()
+
     # compute the best path
-    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit=time_limit - (time()-time_start))
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
+    print(f"First solution (total): {solution[1]}")
+
+    toc_solu = time()
+
+    # decide if there is still time left for more itarations
+    # (for better overall result)
+    solu_time = toc - tic
+    print(f"Solution time: {round(solu_time,2)}")
+    print(f"Time limit: {round(time_limit,2)}")
+    time_limit -= solu_time
+
+    if time_limit > solu_time:
+        # new array to store solutions
+        solu_arr=[]
+
+        # add first found solution
+        solu_arr.append(solution)
+
+        # run the algorythm, as long as the time limit allows
+        print(f"Predicted loops: {int(time_limit/solu_time)}")
+        for i in range(1, 1+int(time_limit/solu_time)):
+            print(f"Loop no: {i}")
+            print("\b" * 100)       # so the "Loop no:.." override itself
+            solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit)
+            solu_arr.append(solution)
+
+        # sort the array by total, descending
+        solu_arr.sort(key=lambda x: x[1], reverse=True)
+
+        # choose the best (in view of total profit) from solutions
+        solution = solu_arr[0]
+        print(f"Choosing the best path finished.")
+        print(f"Worst found solution: {solu_arr[-1][1]}")
+        print(f"Profit from loop: {solution[1] - solu_arr[-1][1]}")
 
     return solution, convert_to_edges_list(solution.path)
