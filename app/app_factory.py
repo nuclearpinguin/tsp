@@ -164,10 +164,12 @@ def create_app():
                 solution = fh.solution_to_output(solution_content)
 
                 if city and paths:
+                    mean_time = paths.travel_time.mean()
                     cities, edges = data_from_solution(cities=parse_contents(city),
                                                        paths=parse_contents(paths),
                                                        solution=solution)
                 else:
+                    mean_time = None
                     cities, edges = data_from_solution(cities=None,
                                                        paths=None,
                                                        solution=solution)
@@ -177,7 +179,7 @@ def create_app():
 
                 # Generate html elements
                 output = [html.H3(children='Solution'), comp.vbar()]
-                output += comp.stats(0.0, solution, cities, new=False)
+                output += comp.stats(0.0, solution, cities, new=False, mean_time=mean_time)
 
                 # Cache data
                 cache = {'cities': prepare_data(cities), 'edges': list(edges)}
@@ -190,6 +192,7 @@ def create_app():
 
             tic = time.time()
             df_time = parse_contents(df_time)
+            mean_time = paths.travel_time.mean()
             solution, cities, edges = make_plot_data(cities=parse_contents(city),
                                                      paths=parse_contents(paths),
                                                      time=df_time,
@@ -203,7 +206,7 @@ def create_app():
 
             # Generate html elements
             output = [html.H3(children='Solution'), comp.vbar()]
-            output += comp.stats(solving_time, solution, cities, df_time.time.values[0])
+            output += comp.stats(solving_time, solution, cities, df_time.time.values[0], mean_time=mean_time)
 
             # Cache data
             cache = {'cities': prepare_data(cities), 'edges': list(edges)}
