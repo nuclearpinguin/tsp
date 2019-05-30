@@ -1,6 +1,7 @@
 import pandas as pd
 from .city import City
 from .random_solver import convert_to_dict, Output
+from time import time as time_temp
 
 
 def choose_the_best_path(resources, cities_list):
@@ -146,7 +147,7 @@ def exact_solve(cities: pd.DataFrame,
                 break
         return all_paths
 
-    def create_all_possible_paths(graph, time_at_the_beggining):
+    def create_all_possible_paths(graph, time_at_the_beggining, time_limit = 60):
         """
         Finds all possible paths in graph.
 
@@ -159,10 +160,14 @@ def exact_solve(cities: pd.DataFrame,
         -------
         A list [[path_1], [path_2], [path_3], ...]
         """
+        start = time_temp()
         list_of_paths = []
         for x in graph.keys():
             list_of_paths = list_of_paths + find_all_possible_paths(graph, x, time_at_the_beggining)
             print(x)
+            end = time_temp() - start
+            if time_limit - end <0:
+                break
         return list_of_paths
 
     working_time = df_time['time'].values[0]
