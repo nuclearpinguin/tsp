@@ -2,6 +2,7 @@
 import time
 import dash
 import flask
+import numpy as np
 import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
@@ -75,7 +76,7 @@ def create_app():
 
             html.Div(id='simulations-slider-output', style={'margin-top': '40px'}),
             dcc.Slider(min=10, max=490, value=90, id='simulations-slider',
-                       marks={(10 * i * i): f'{10 * i * i}' for i in range(1, 10)}),
+                       marks={(10 * i * i): f'{10 * i * i}' for i in range(1, 8)}),
             comp.button('solve-btn', 'solve'),
         ]),
 
@@ -164,9 +165,10 @@ def create_app():
                 solution = fh.solution_to_output(solution_content)
 
                 if city and paths:
-                    mean_time = paths.travel_time.mean()
+                    paths = parse_contents(paths)
+                    mean_time = np.mean(paths.travel_time.values)
                     cities, edges = data_from_solution(cities=parse_contents(city),
-                                                       paths=parse_contents(paths),
+                                                       paths=paths,
                                                        solution=solution)
                 else:
                     mean_time = None
@@ -192,9 +194,10 @@ def create_app():
 
             tic = time.time()
             df_time = parse_contents(df_time)
-            mean_time = paths.travel_time.mean()
+            paths = parse_contents(paths)
+            mean_time = np.mean(paths.travel_time.values)
             solution, cities, edges = make_plot_data(cities=parse_contents(city),
-                                                     paths=parse_contents(paths),
+                                                     paths=paths,
                                                      time=df_time,
                                                      simulations=n_sim,
                                                      time_limit=time_limit,
@@ -206,7 +209,7 @@ def create_app():
 
             # Generate html elements
             output = [html.H3(children='Solution'), comp.vbar()]
-            output += comp.stats(solving_time, solution, cities, df_time.time.values[0], mean_time=mean_time)
+            output += comp.stats(solving_time, solution, cities, input_time=df_time.time.values[0], mean_time=mean_time)
 
             # Cache data
             cache = {'cities': prepare_data(cities), 'edges': list(edges)}
