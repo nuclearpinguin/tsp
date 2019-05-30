@@ -119,7 +119,7 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
 def find_best_of_random_paths(cities_dict: dict,
                               working_time: int,
                               n: int,
-                              time_limit: int) -> Output:
+                              time_limit: float) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
 
@@ -204,7 +204,7 @@ def solve(cities: pd.DataFrame,
     Solution and list of selected edges.
     Tuple[Output, list]
     """
-    time_start = time()
+    tic = time()
 
     assert isinstance(cities, pd.DataFrame), 'Wrong data format!'
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
@@ -226,7 +226,13 @@ def solve(cities: pd.DataFrame,
     # get working time from the data frame
     working_time = df_time['time'].values[0]
 
+    toc = time() - tic
+    time_left = time_limit - toc
+
+    if time_left < 0:
+        return Output(path=[], time_left=working_time, total=0), []
+
     # compute the best path
-    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit=time_limit - (time()-time_start))
+    solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_limit=time_left)
 
     return solution, convert_to_edges_list(solution.path)
