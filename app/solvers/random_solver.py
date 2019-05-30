@@ -220,6 +220,12 @@ def solve(cities: pd.DataFrame,
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
     assert isinstance(df_time, pd.DataFrame), 'Wrong data format!'
 
+    if edges.shape[0] < 1:
+        t = int(df_time.values[0])
+        name, x, y, q = cities.values[0]
+        output = Output(path=[City(name, x, y, q)], total=q, time_left=t)
+        return output, []
+
     # header for better readability in console
     print("= = = = = = = = = = = = = = = = = = = = =")
 
@@ -241,9 +247,9 @@ def solve(cities: pd.DataFrame,
         cities_dict[k] = c
 
     toc_dict = time() - tic_dict
+
     print()
     print(f"Creating dictionary time:\t{round(toc_dict,2)}s")
-
 
     # get working time from the data frame
     working_time = df_time['time'].values[0]
@@ -265,7 +271,6 @@ def solve(cities: pd.DataFrame,
         best_solu = Output(time_left, 0, [])
         # worst solution found as far
         worst_solu = Output(time_left, 1000, [])
-
 
         # for displaying in later statistics
         iterations_counter = 0
