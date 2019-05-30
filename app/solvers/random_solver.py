@@ -119,7 +119,7 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
 def find_best_of_random_paths(cities_dict: dict,
                               working_time: int,
                               n: int,
-                              time_limit: int) -> Output:
+                              time_limit: float) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
 

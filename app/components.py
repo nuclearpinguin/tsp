@@ -109,7 +109,7 @@ def upload(idx: str, name: str = 'Select Files'):
     ])
 
 
-def stats(solve_time: float, solution, cities: list, input_time: int = 0, new: bool = True):
+def stats(solve_time: float, solution, cities: list, mean_time: float, input_time: int = 0, new: bool = True):
     """
     Reusable component for solution statistics.
 
@@ -139,6 +139,7 @@ def stats(solve_time: float, solution, cities: list, input_time: int = 0, new: b
             html.Li(html.P(f'Time left: {time_left}')),
             html.Li(html.P(f'Earned / total: {solution.total}')),
             html.Li(html.P(f'Mean quantity: {float(np.mean([c.value for c in cities])):.2f}')),
+            html.Li(html.P(f'Mean time: {mean_time:.2f}')),
             html.A('Download',
                    href="/tmp/solution", target='blank',
                    style={'font-size': '16pt', 'text-transform': 'uppercase'}
