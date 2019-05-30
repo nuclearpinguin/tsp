@@ -234,8 +234,6 @@ def solve(cities: pd.DataFrame,
     # build a dict {city_name : City object}
     cities_dict = {}
 
-    tic = time()
-
     for (i, k) in enumerate(d.keys()):
         print(f"Creating dictionary:\t\t{round((i+1)/len(d.keys())*100)}%", end="\r")
 
@@ -280,7 +278,8 @@ def solve(cities: pd.DataFrame,
     # While there is still time left, try
     # to improve solution. Only if looking for solution takes
     # more than half a second
-    while time_left > 0.1 and first_solution_time > 0.2:
+    rule = 0.2 < first_solution_time < time_left / 2
+    while time_left > 0.1 and rule:
 
         # Search again and measure time
         tic = time()
