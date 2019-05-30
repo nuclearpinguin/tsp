@@ -6,7 +6,6 @@ import pandas as pd
 from plotly.graph_objs.scatter import Marker
 from typing import List
 from functools import reduce
-from time import time as now
 
 from app.solvers import City
 
@@ -75,8 +74,6 @@ def make_graph(nodes: list, edges: list):
     add_y = edge_labels_y.append
     add_txt = edge_labels_txt.append
 
-    tic = now()
-
     # Create edges plot
     edge_traces = []
     add = edge_traces.append
@@ -96,8 +93,6 @@ def make_graph(nodes: list, edges: list):
         add_x((x0 + x1) / 2)
         add_y((y0 + y1) / 2)
         add_txt(f"time: {info['time'] }")
-
-    print(f'edges : {now() - tic}')
 
     # Hack for info hover on edges:
     middle_node_trace = go.Scatter(
@@ -121,8 +116,6 @@ def make_graph(nodes: list, edges: list):
             line=dict(width=2))
     )
 
-    tic = now()
-
     # Create nodes plot
     for node in G.nodes():
         the_node = G.node[node]
@@ -131,8 +124,6 @@ def make_graph(nodes: list, edges: list):
         node_trace['y'] += tuple([y])
         node_info = reduce(lambda a, b: f'{a} | {b}', [f'{k} : {v}' for k, v in the_node.items()])
         node_trace['text'] += tuple([node_info])
-
-    print(f'edges : {now() - tic}')
 
     data = edge_traces + [node_trace, middle_node_trace]
 

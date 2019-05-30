@@ -109,7 +109,7 @@ def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
 
     ucl = len(unique_cities)
     upl = len(unique_paths)
-    if ucl > upl:
+    if ucl > upl and ucl > 1:
         return Result(False, f'It seems that there are {ucl- upl} \
         cities that are lonely islands. Take care of them!')
 
@@ -117,8 +117,8 @@ def validate_paths(df: pd.DataFrame, cities: pd.DataFrame) -> Result:
         return Result(False, f'It seems that there are {upl-ucl} cities that \
         are unplottable. Check if each city in paths is provided with coordinates')
 
-    if unique_cities != unique_paths:
-        return Result(False, 'Something elements differs')
+    if unique_cities != unique_paths and ucl > 1:
+        return Result(False, 'Some elements differs')
 
     for city_from, city_to, dist in df.values:
         try:

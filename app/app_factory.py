@@ -166,12 +166,15 @@ def create_app():
 
                 if city and paths:
                     paths = parse_contents(paths)
-                    mean_time = np.mean(paths.travel_time.values)
+                    if paths.shape[0] > 0:
+                        mean_time = np.mean(paths.travel_time.values)
+                    else:
+                        mean_time = 0.0
                     cities, edges = data_from_solution(cities=parse_contents(city),
                                                        paths=paths,
                                                        solution=solution)
                 else:
-                    mean_time = None
+                    mean_time = 0.0
                     cities, edges = data_from_solution(cities=None,
                                                        paths=None,
                                                        solution=solution)
@@ -195,7 +198,11 @@ def create_app():
             tic = time.time()
             df_time = parse_contents(df_time)
             paths = parse_contents(paths)
-            mean_time = np.mean(paths.travel_time.values)
+            if paths.shape[0] > 0:
+                mean_time = np.mean(paths.travel_time.values)
+            else:
+                mean_time = 0.0
+
             solution, cities, edges = make_plot_data(cities=parse_contents(city),
                                                      paths=paths,
                                                      time=df_time,
