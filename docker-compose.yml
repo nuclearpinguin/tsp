@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  core:
+    build: .
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: bash -c "gunicorn --workers=4 --bind=0.0.0.0:80 gapp:app"
+    expose:
+      - 80
+    ports:
+      - 80:80
