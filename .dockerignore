@@ -1,0 +1,7 @@
+/venv
+/html
+/htmlcov
+/tests
+/sample*
+/docs
+*.ipynb
