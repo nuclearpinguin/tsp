@@ -133,7 +133,7 @@ def find_random_path(cities_dict: dict, starting_city: City, time_left: int) -> 
 def find_best_of_random_paths(cities_dict: dict,
                               working_time: int,
                               n: int,
-                              time_limit: int) -> Output:
+                              time_limit: float) -> Output:
     """
     Returns list [time_left, sum, path] for the best of paths found in random walk.
 
@@ -153,7 +153,6 @@ def find_best_of_random_paths(cities_dict: dict,
     best_paths = []
 
     for (i, starting_city) in enumerate(cities_dict.keys()):
-        # print(f"Looping: {round((i+1)/len(cities_dict.keys())*100)}%", end="\r")
         lst = []
 
         # for better performance, define
@@ -176,7 +175,6 @@ def find_best_of_random_paths(cities_dict: dict,
 
         # update time limit
         time_limit -= toc
-
 
         # if finding the best path took time_limit [in seconds] as far,
         # break the loop and select the best of paths found as far
@@ -224,20 +222,19 @@ def solve(cities: pd.DataFrame,
     assert isinstance(edges, pd.DataFrame), 'Wrong data format!'
     assert isinstance(df_time, pd.DataFrame), 'Wrong data format!'
 
-    if cities['name'].count() == 0:
-        solution = Output(time_limit, 0, [])
-        return  solution, []
+    # get working time from the data frame
+    working_time = df_time['time'].values[0]
 
-    # header for better readability in console
-    print("= = = = = = = = = = = = = = = = = = = = =")
+    if edges.shape[0] < 1:
+        name, x, y, q = cities.values[0]
+        output = Output(path=[City(name, x, y, q)], total=q, time_left=working_time)
+        return output, []
 
     # build a dictionary {city : {neighbour1 : travel_time1, neighbour2 : travel_time2}}
     d = convert_to_dict(cities, edges, time_limit)
 
     # build a dict {city_name : City object}
     cities_dict = {}
-
-    tic_dict = time()
 
     for (i, k) in enumerate(d.keys()):
         print(f"Creating dictionary:\t\t{round((i+1)/len(d.keys())*100)}%", end="\r")
@@ -248,73 +245,58 @@ def solve(cities: pd.DataFrame,
         c.set_neighbours(d)
         cities_dict[k] = c
 
-    toc_dict = time() - tic_dict
-    print()
-    print(f"Creating dictionary time:\t{round(toc_dict,2)}s")
+    toc = time()
+    dict_processing_time = toc - tic
 
+    print(f"\nCreating dictionary time:\t{dict_processing_time:.2f}s\n")
 
-    # get working time from the data frame
-    working_time = df_time['time'].values[0]
-
-    # preprocessing time
-    preproc_time = time() - tic
-
-    print()
-
-    # if preprocessing data took longer than given time
-    if preproc_time > time_limit:
-        print("Solving interrupted, time of preprocessing was too long.")
-        solu = Output(working_time, 0, [])
-        return solu, []
+    # If preprocessing data took longer than given time
+    # return city with biggest quantity
+    if dict_processing_time > time_limit:
+        cities = cities.values.to_list()
+        cities.sort(lambda x: x[3])
+        name, x, y, q = cities.values[-1]
+        output = Output(path=[City(name, x, y, q)], total=q, time_left=working_time)
+        return output, []
 
     # else
-    time_left = time_limit - preproc_time
+    time_left = time_limit - dict_processing_time
 
-    # best solution found as far
-    best_solu = Output(time_left, 0, [])
-    # worst solution found as far
-    worst_solu = Output(time_left, 10 ** 10, [])
+    # If enough time -> find solution
+    if time_left > 0.1:
+        tic = time()
+        best_solu = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_left)
+        toc = time()
+        first_solution_time = (toc - tic)
+        time_left -= first_solution_time
+    else:
+        # Return city with with greatest quantity
+        t = int(df_time.values[0])
+        cities = cities.values.to_list()
+        cities.sort(lambda x: x[3])
+        name, x, y, q = cities.values[-1]
+        output = Output(path=[City(name, x, y, q)], total=q, time_left=t)
+        return output, []
 
-    # for displaying in later statistics
-    iteration_counter = 0
+    # While there is still time left, try
+    # to improve solution. Only if looking for solution takes
+    # more than 0.2 second
+    rule = 0.2 < first_solution_time < time_left / 2
+    while time_left > 0.1 and rule:
 
-    # execution time of the algorithm
-    toc_solu = 0
-
-    # while there is still time left
-    while time_left > 0.1:
-
-        # execution time of the algorithm
-        tic_solu = time()
-
-        # compute the best path
+        # Search again and measure time
+        tic = time()
         solution = find_best_of_random_paths(cities_dict, working_time, n_simulation, time_left)
-
-        # print(f"Solution: {solution.total}")
-
-        # measure how long executing solution took
-        toc_solu = time() - tic_solu
+        toc = time()
 
         # update time left
-        time_left -= toc_solu
-
-        # update iterator
-        iteration_counter += 1
-
-        print(f"Time left:\t\t{round(time_left,2)}s", end="\r")
+        time_left -= (toc - tic)
 
         # update best and worst solutions (for later comparison)
         if solution.total >= best_solu.total:
             best_solu = solution
-        if solution.total <= worst_solu.total:
-            worst_solu = solution
 
-    print()
-    print(f"> Best solution total:\t{best_solu.total}")
-    print(f"> Worst solution total:\t{worst_solu.total}")
-    print(f"> Looping profit:\t{best_solu.total - worst_solu.total}")
-    print(f"> Iterations:\t\t{iteration_counter}")
-
+    print(f"\n> Best solution total:\t{best_solu.total}")
     print("Solving finished.")
 
     return best_solu, convert_to_edges_list(best_solu.path)
